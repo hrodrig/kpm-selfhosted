@@ -1,0 +1,42 @@
+# Deny-all by default
+*
+.*
+
+# Allowlist: repository metadata
+!.gitignore
+!VERSION
+!LICENSE
+!README.md
+!CONTRIBUTING.md
+!AGENTS.md
+!SECURITY.md
+!CODE_OF_CONDUCT.md
+!CHANGELOG.md
+
+# Images (README hero, etc.)
+!assets/
+!assets/**
+
+# Testing (scripts)
+!testing/
+!testing/**
+
+# GitHub Actions
+!.github/
+!.github/workflows/
+!.github/workflows/**
+
+# Deployment tree
+!Makefile
+!run/
+!run/**
+
+# Optional local data placeholder
+!data/
+!data/.keep
+
+# Generated noise
+.DS_Store
+
+# Local-only — Cursor rules and IDE metadata (not committed).
+.cursor/

@@ -1,0 +1,37 @@
+# One-shot sample → SQLite (interval_seconds: 0). Exit 0 = ok, 2 = cluster/Metrics/RBAC.
+# Override store.path and optional scope for your cluster.
+# Optional Slack: set KPM_SLACK_WEBHOOK when enabling notification sinks.
+
+cluster:
+  name: "example-cluster"
+  environment: "dev"
+  description: "Operator minimal profile for kpm-selfhosted"
+
+kube:
+  context: ""
+
+client:
+  id: ""
+
+store:
+  path: "/data/metrics.db"
+  retention_days: 14
+
+sample:
+  interval_seconds: 0
+
+# scope:
+#   namespaces: ["app"]
+#   pod_labels: ""
+
+recommend:
+  window_days: 7
+  percentile: 95
+  min_samples: 24
+  target_utilization: 0.70
+
+# notifications:
+#   enabled: true
+#   sinks:
+#     - type: slack
+#       webhook_url_env: KPM_SLACK_WEBHOOK

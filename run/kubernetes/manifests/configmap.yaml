@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kpm-config
+  namespace: kpm
+data:
+  # CronJob one-shot sample (interval_seconds: 0)
+  kpm.yml: |
+    cluster:
+      name: "in-cluster"
+      environment: "prod"
+      description: "kpm CronJob sampler"
+    kube:
+      context: ""
+    client:
+      id: "kpm-cron"
+    store:
+      path: "/data/metrics.db"
+      retention_days: 45
+    sample:
+      interval_seconds: 0
+    # scope:
+    #   namespaces: ["app"]
+    recommend:
+      window_days: 7
+      percentile: 95
+      min_samples: 24
+      target_utilization: 0.70
+  # Deployment daemon (interval_seconds > 0 + MCP listen for probes)
+  kpm-daemon.yml: |
+    cluster:
+      name: "in-cluster"
+      environment: "prod"
+      description: "kpm daemon sampler"
+    kube:
+      context: ""
+    client:
+      id: "kpm-daemon"
+    store:
+      path: "/data/metrics.db"
+      retention_days: 45
+    sample:
+      interval_seconds: 300
+    # scope:
+    #   namespaces: ["app"]
+    recommend:
+      window_days: 7
+      percentile: 95
+      min_samples: 24
+      target_utilization: 0.70
+    mcp:
+      enabled: true
+      listen: "0.0.0.0:9740"
+      token_env: KPM_MCP_TOKEN

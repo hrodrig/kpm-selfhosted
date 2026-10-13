@@ -1,0 +1,24 @@
+# Docs and release metadata checks (no Go build in this repo).
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Release metadata check
+        run: |
+          chmod +x testing/scripts/release-check.sh
+          testing/scripts/release-check.sh

@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kpm-sample
+  namespace: kpm
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          serviceAccountName: kpm
+          restartPolicy: Never
+          containers:
+            - name: kpm
+              image: ghcr.io/hrodrig/kpm:v0.6.0
+              args: ["sample", "--config", "/config/kpm.yml"]
+              envFrom:
+                - secretRef:
+                    name: kpm-secrets
+                    optional: true
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+                  readOnly: true
+                - name: store
+                  mountPath: /data
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+          volumes:
+            - name: config
+              configMap:
+                name: kpm-config
+            - name: store
+              persistentVolumeClaim:
+                claimName: kpm-store

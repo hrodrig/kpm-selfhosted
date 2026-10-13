@@ -1,0 +1,74 @@
+# Daemon shape: ConfigMap must use interval_seconds > 0 and mcp/server listen
+# (see run/examples/kpm-daemon.yml). Set KPM_MCP_TOKEN in Secret kpm-secrets.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kpm
+  namespace: kpm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kpm
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kpm
+    spec:
+      serviceAccountName: kpm
+      containers:
+        - name: kpm
+          image: ghcr.io/hrodrig/kpm:v0.6.0
+          args: ["sample", "--config", "/config/kpm-daemon.yml"]
+          ports:
+            - name: http
+              containerPort: 9740
+          envFrom:
+            - secretRef:
+                name: kpm-secrets
+                optional: true
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: store
+              mountPath: /data
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: config
+          configMap:
+            name: kpm-config
+        - name: store
+          persistentVolumeClaim:
+            claimName: kpm-store
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kpm
+  namespace: kpm
+spec:
+  selector:
+    app.kubernetes.io/name: kpm
+  ports:
+    - name: http
+      port: 9740
+      targetPort: http

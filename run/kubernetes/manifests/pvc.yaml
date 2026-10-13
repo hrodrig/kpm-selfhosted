@@ -1,0 +1,13 @@
+# SQLite store for sample history (recommend / capacity windows).
+# RWO: CronJob concurrencyPolicy Forbid; Deployment replicas: 1.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kpm-store
+  namespace: kpm
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
