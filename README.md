@@ -20,7 +20,19 @@ Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/k
 
 **Default app image pin:** [`ghcr.io/hrodrig/kpm:v0.6.0`](https://github.com/hrodrig/kpm/releases/tag/v0.6.0).
 
+**Walkthrough (DEV.to):** [kpm — Kubernetes rightsizing without Prometheus, history on your laptop](https://dev.to/hrodrig/kpm-kubernetes-rightsizing-without-prometheus-history-on-your-laptop-4272) · product screens in the [kpm README](https://github.com/hrodrig/kpm#whats-new-in-06--analyze-local-charts).
+
 **Policies:** [Community and policies](#community-and-policies), [community standards](#community-standards) — changelog, contributing, security, code of conduct, agent guidelines.
+
+![kpm serve — analyze-local charts](assets/kpm-serve-analyze-local-dark.png)
+
+*`kpm serve` (same binary as the pin above): analyze-local charts from the SQLite store you persist on a PVC or host volume.*
+
+![kpm tui — CPU vs request spectrum](assets/kpm-tui-cpu-request-13pods.png)
+
+*Live TUI (`kpm tui`) — useful on a bastion after installing the release binary; daemon/CronJob shapes keep history for recommend / serve.*
+
+![kpm flow — sample to SQLite to facades](assets/kpm-flow-diagram.png)
 
 ---
 
@@ -211,7 +223,7 @@ run/
 └── standalone/{linux,macos,bsd}/
 testing/
 └── scripts/                     # release-check.sh, extract-changelog.sh
-assets/                          # README hero (kpm-selfhosted-hero.jpg)
+assets/                          # README hero + product captures (TUI / serve / flow)
 Makefile                         # release-check
 ```
 
