@@ -8,6 +8,8 @@
 [![CI](https://github.com/hrodrig/kpm-selfhosted/actions/workflows/ci.yml/badge.svg)](https://github.com/hrodrig/kpm-selfhosted/actions/workflows/ci.yml)
 [![gghstats clones](https://gghstats.hermesrodriguez.com/api/v1/badge/hrodrig/kpm-selfhosted?metric=clones)](https://gghstats.hermesrodriguez.com/hrodrig/kpm-selfhosted)
 
+![kpm-selfhosted — Docker, Kubernetes manifests, standalone run/](assets/kpm-selfhosted-hero.jpg)
+
 Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/kpm)** — `docker run`, in-cluster CronJob/Deployment (SQLite on PVC), standalone cron/systemd. **App source and releases:** [github.com/hrodrig/kpm](https://github.com/hrodrig/kpm).
 
 > **Early development (pre-1.0).** Upstream **kpm** is under active development
@@ -209,7 +211,7 @@ run/
 └── standalone/{linux,macos,bsd}/
 testing/
 └── scripts/                     # release-check.sh, extract-changelog.sh
-assets/                          # README hero (optional)
+assets/                          # README hero (kpm-selfhosted-hero.jpg)
 Makefile                         # release-check
 ```
 

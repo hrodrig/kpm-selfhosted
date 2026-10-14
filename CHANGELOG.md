@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- README hero: `assets/kpm-selfhosted-hero.jpg` (same family artwork as upstream `kpm` OSS hero).
+
 ## [0.1.0] - 2026-10-13
 
 ### Added
