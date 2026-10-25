@@ -27,6 +27,8 @@ sequenceDiagram
   Op->>Pub: helm pull kpm/kpm --version 0.1.0
   Op->>Pub: docker pull ghcr.io/hrodrig/kpm:v1.1.0
   Op->>Pub: docker pull registry.k8s.io/kubectl:v1.33.13
+  Op->>Op: docker tag kpm as my-private.azcr.io/customer/kpm:v1.1.0 and :sha256-hex
+  Op->>Op: docker tag kubectl as my-private.azcr.io/customer/kubectl:v1.33.13
   Op->>Reg: helm push chart to oci://…/helm
   Op->>Reg: docker push customer/kpm:v1.1.0 and :sha256-hex
   Op->>Reg: docker push customer/kubectl:v1.33.13
