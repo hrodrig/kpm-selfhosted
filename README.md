@@ -202,6 +202,8 @@ helm install kpm kpm/kpm \
 
 Default `sampler` is `daemon` (one replica, RWO PVC, charts on `:9740`, MCP off). `sampler=cronjob` is the one-shot sample Job and does not render the Deployment. The recommend CronJob execs into the daemon and does not mount the disk. Do not install the chart and the flat manifests against the same claim.
 
+To install from a private registry, mirror the chart and the images first, then point Helm at that registry. Steps: [private-registry.md](run/kubernetes/private-registry.md).
+
 A repo tag `v*` runs [Release Charts](.github/workflows/release-charts.yml). chart-releaser publishes GitHub Release `kpm-<chartVersion>` and the `gh-pages` index (`https://hrodrig.github.io/kpm-selfhosted`). That is separate from the docs Release for the same git tag. Set GitHub Pages to branch `gh-pages`, folder `/`. Do not edit `gh-pages` by hand. The job packages a chart only when that tag's diff touches `run/kubernetes/helm/`.
 
 **[↑ Contents](#table-of-contents)**
