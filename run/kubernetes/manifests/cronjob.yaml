@@ -1,3 +1,6 @@
+# One-shot sampler. Mounts the RWO store. Do not apply together with
+# deployment.yaml. For a daemon that stays up, use deployment.yaml plus
+# recommend-cronjob.yaml (that Job does not mount the claim).
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -17,7 +20,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: kpm
-              image: ghcr.io/hrodrig/kpm:v0.6.0
+              image: ghcr.io/hrodrig/kpm:v1.1.0
               args: ["sample", "--config", "/config/kpm.yml"]
               envFrom:
                 - secretRef:

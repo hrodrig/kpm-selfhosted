@@ -32,3 +32,42 @@ subjects:
   - kind: ServiceAccount
     name: kpm
     namespace: kpm
+---
+# Recommend CronJob only. It does not mount the store. kubectl exec runs
+# `kpm recommend --record` inside the daemon pod, which already holds the RWO PVC.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kpm-recommend
+  namespace: kpm
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kpm-recommend
+  namespace: kpm
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+  # `kubectl exec deploy/kpm` reads the Deployment, then execs a selected pod.
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kpm-recommend
+  namespace: kpm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kpm-recommend
+subjects:
+  - kind: ServiceAccount
+    name: kpm-recommend
+    namespace: kpm

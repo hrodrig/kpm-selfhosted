@@ -1,0 +1,39 @@
+name: helm-lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.17.3
+
+      - name: Lint daemon shape
+        run: |
+          helm lint run/kubernetes/helm/kpm \
+            --set secrets.existingSecret=kpm-secrets
+          helm template kpm run/kubernetes/helm/kpm \
+            --namespace kpm \
+            --set secrets.existingSecret=kpm-secrets >/dev/null
+
+      - name: Lint one-shot CronJob shape
+        run: |
+          helm lint run/kubernetes/helm/kpm \
+            --set sampler=cronjob \
+            --set server.enabled=false
+          helm template kpm run/kubernetes/helm/kpm \
+            --namespace kpm \
+            --set sampler=cronjob \
+            --set server.enabled=false >/dev/null

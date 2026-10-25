@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>kpm Helm charts</title>
+</head>
+<body>
+  <h1>kpm Helm charts</h1>
+  <p>
+    Helm repository for
+    <a href="https://github.com/hrodrig/kpm-selfhosted">kpm-selfhosted</a>.
+    The chart packages the in-cluster sampler. The application image is
+    <a href="https://github.com/hrodrig/kpm">kpm</a>.
+  </p>
+  <pre>helm repo add kpm https://hrodrig.github.io/kpm-selfhosted/
+helm repo update
+helm install kpm kpm/kpm --namespace kpm --create-namespace \
+  --set secrets.existingSecret=kpm-secrets</pre>
+  <p>Chart index: <a href="index.yaml">index.yaml</a>.</p>
+</body>
+</html>

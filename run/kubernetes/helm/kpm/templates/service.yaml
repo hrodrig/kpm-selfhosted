@@ -1,0 +1,17 @@
+{{- if and (eq .Values.sampler "daemon") (eq (include "kpm.httpEnabled" .) "true") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kpm.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kpm.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "kpm.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+{{- end }}

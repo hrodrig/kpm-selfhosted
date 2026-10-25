@@ -2,7 +2,7 @@
 
 ← [Back to run/standalone](../README.md) · [run/README](../../README.md).
 
-1. Download a **Linux** tarball from **[kpm Releases](https://github.com/hrodrig/kpm/releases)** (e.g. `kpm_v0.6.0_linux_amd64.tar.gz`).
+1. Download a **Linux** tarball from **[kpm Releases](https://github.com/hrodrig/kpm/releases)** (e.g. `kpm_v1.1.0_linux_amd64.tar.gz`).
 2. Extract **`kpm`** (and optionally **`kubectl-kpm`**), then `chmod +x kpm`.
 3. Copy a profile (e.g. [kpm-minimal.yml](../../examples/kpm-minimal.yml)) and edit `store.path` / optional `scope:`.
 
@@ -39,6 +39,6 @@ RestartSec=10
 WantedBy=multi-user.target
 ```
 
-Put `KPM_SLACK_WEBHOOK=...` and `KPM_MCP_TOKEN=...` in `/etc/kpm/kpm.env` (mode `0600`). Prefer `mcp.listen: 127.0.0.1:9740` unless scrapers need another bind.
+Put `KPM_SLACK_WEBHOOK=...` and `KPM_SERVER_TOKEN=...` in `/etc/kpm/kpm.env` (mode `0600`). Add `KPM_MCP_TOKEN` only after uncommenting `mcp.enabled`. Prefer `server.listen: 127.0.0.1:9740` on a host unless a proxy needs another bind.
 
 Docker path: [run/docker/README.md](../../docker/README.md).
