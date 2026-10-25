@@ -26,7 +26,7 @@ data:
       percentile: 95
       min_samples: 24
       target_utilization: 0.70
-  # Deployment daemon (interval_seconds > 0 + MCP listen for probes)
+  # Deployment daemon (interval_seconds > 0 + server listen). MCP stays off.
   kpm-daemon.yml: |
     cluster:
       name: "in-cluster"
@@ -48,7 +48,13 @@ data:
       percentile: 95
       min_samples: 24
       target_utilization: 0.70
-    mcp:
+    # mcp:
+    #   enabled: true
+    #   listen: "0.0.0.0:9740"
+    #   token_env: KPM_MCP_TOKEN
+    # Charts UI (GET /, /ui) and JSON /api/v1. Off-loopback requires the bearer.
+    # HTML is public; the page stores the token in sessionStorage after unlock.
+    server:
       enabled: true
       listen: "0.0.0.0:9740"
-      token_env: KPM_MCP_TOKEN
+      token_env: KPM_SERVER_TOKEN

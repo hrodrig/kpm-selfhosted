@@ -2,7 +2,7 @@
 
 This tree holds **how to run kpm**, not the CLI source. Product docs: [kpm](https://github.com/hrodrig/kpm).
 
-**Image pin (default in manifests):** `ghcr.io/hrodrig/kpm:v0.6.0`
+**Image pin (default in manifests):** `ghcr.io/hrodrig/kpm:v1.0.0`
 
 | Directory | Purpose |
 |-----------|---------|
@@ -17,7 +17,7 @@ This tree holds **how to run kpm**, not the CLI source. Product docs: [kpm](http
 |-----------|------------|
 | kubeconfig on a laptop / bastion | [docker/README.md](docker/README.md) |
 | Kubernetes, scheduled one-shot sample | [kubernetes/manifests/cronjob.yaml](kubernetes/manifests/cronjob.yaml) |
-| Kubernetes, long-running daemon | [kubernetes/manifests/deployment.yaml](kubernetes/manifests/deployment.yaml) |
+| Kubernetes, long-running daemon | [kubernetes/manifests/deployment.yaml](kubernetes/manifests/deployment.yaml) plus [recommend-cronjob.yaml](kubernetes/manifests/recommend-cronjob.yaml) |
 | Linux host + cron only | [standalone/README.md](standalone/README.md) |
 | Need a starter config | [examples/](examples/README.md) |
 

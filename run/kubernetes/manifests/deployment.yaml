@@ -1,5 +1,8 @@
-# Daemon shape: ConfigMap must use interval_seconds > 0 and mcp/server listen
-# (see run/examples/kpm-daemon.yml). Set KPM_MCP_TOKEN in Secret kpm-secrets.
+# Daemon shape: ConfigMap must use interval_seconds > 0 and server listen
+# (see run/examples/kpm-daemon.yml). Set KPM_SERVER_TOKEN in Secret kpm-secrets.
+# Set KPM_MCP_TOKEN only after uncommenting mcp.enabled. One replica: the
+# SQLite PVC is ReadWriteOnce.
+# Do not also apply cronjob.yaml (kpm-sample); that Job mounts the same claim.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,7 +21,7 @@ spec:
       serviceAccountName: kpm
       containers:
         - name: kpm
-          image: ghcr.io/hrodrig/kpm:v0.6.0
+          image: ghcr.io/hrodrig/kpm:v1.0.0
           args: ["sample", "--config", "/config/kpm-daemon.yml"]
           ports:
             - name: http

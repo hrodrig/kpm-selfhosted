@@ -9,7 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Daemon profile enables the charts UI and `GET /api/v1` (`server.enabled`, bearer `KPM_SERVER_TOKEN`). MCP stays commented out.
+- CronJob `kpm-recommend` runs `kpm recommend --record` with `kubectl exec` into the daemon pod. The Job does not mount the RWO store. ServiceAccount `kpm-recommend` is namespace-local (`pods` get/list, `pods/exec`, `deployments` get).
 - README hero: `assets/kpm-selfhosted-hero.jpg` (same family artwork as upstream `kpm` OSS hero).
+
+### Changed
+
+- Application image pin `ghcr.io/hrodrig/kpm:v1.0.0` in `run/` docs and manifests.
 - README product captures (`assets/kpm-serve-analyze-local-dark.png`,
   `assets/kpm-tui-cpu-request-13pods.png`, `assets/kpm-flow-diagram.png`) plus link to the
   [DEV.to walkthrough](https://dev.to/hrodrig/kpm-kubernetes-rightsizing-without-prometheus-history-on-your-laptop-4272).
