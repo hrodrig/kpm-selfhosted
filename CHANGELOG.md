@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Helm chart `run/kubernetes/helm/kpm` (package `0.1.0`, `appVersion` `v1.0.0`). Daemon is the default. MCP stays off. The recommend CronJob execs into the daemon pod and does not mount the PVC. `affinity` schedules the sampler pod and the recommend Job. Daemon container resources are the top-level `resources` object. Pods run as distroless nonroot (65532) with a read-only root filesystem, dropped capabilities, and RuntimeDefault seccomp. `imagePullSecrets` is optional. Liveness probe is `/livez` (readiness stays `/readyz`). Image `v1.0.0` still serves `/healthz`; set `probes.livenessPath` until [kpm#141](https://github.com/hrodrig/kpm/issues/141) ships. `secrets.existingSecret` is documented with create examples in the chart README, values, and install notes.
+- Helm chart `run/kubernetes/helm/kpm` (package `0.1.0`, `appVersion` `v1.1.0`). Daemon is the default. MCP stays off. The recommend CronJob execs into the daemon pod and does not mount the PVC. `affinity` schedules the sampler pod and the recommend Job. Daemon container resources are the top-level `resources` object. Pods run as distroless nonroot (65532) with a read-only root filesystem, dropped capabilities, and RuntimeDefault seccomp. `imagePullSecrets` is optional. Liveness probe is `/livez` (readiness stays `/readyz`), matching kpm v1.1.0. `secrets.existingSecret` is documented with create examples in the chart README, values, and install notes.
 - Chart publish workflow `.github/workflows/release-charts.yml`. A `v*` tag runs chart-releaser (`charts_dir` `run/kubernetes/helm`) and publishes GitHub Release `kpm-<chartVersion>` plus the `gh-pages` index. That release is separate from the docs Release created by `release.yml`.
 - macOS notes point at `brew install --cask hrodrig/kpm/kpm`. The tap is written by the kpm release.
 - Daemon profile enables the charts UI and `GET /api/v1` (`server.enabled`, bearer `KPM_SERVER_TOKEN`). MCP stays commented out.
@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Application image pin `ghcr.io/hrodrig/kpm:v1.0.0` in `run/` docs and manifests.
+- Application image pin `ghcr.io/hrodrig/kpm:v1.1.0` in `run/` docs and manifests.
 - README product captures (`assets/kpm-serve-analyze-local-dark.png`,
   `assets/kpm-tui-cpu-request-13pods.png`, `assets/kpm-flow-diagram.png`) plus link to the
   [DEV.to walkthrough](https://dev.to/hrodrig/kpm-kubernetes-rightsizing-without-prometheus-history-on-your-laptop-4272).

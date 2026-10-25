@@ -20,7 +20,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: kpm
-              image: ghcr.io/hrodrig/kpm:v1.0.0
+              image: ghcr.io/hrodrig/kpm:v1.1.0
               args: ["sample", "--config", "/config/kpm.yml"]
               envFrom:
                 - secretRef:

@@ -58,16 +58,6 @@ secrets:
   existingSecret: kpm-secrets
 ```
 
-### v1.0.0 liveness path
-
-The chart probes `/livez`. Image `v1.0.0` still serves `/healthz`. Until a
-published image serves `/livez`:
-
-```yaml
-probes:
-  livenessPath: /healthz
-```
-
 ## One writer
 
 Do not install this chart and `run/kubernetes/manifests/` against the same PVC.

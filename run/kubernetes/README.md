@@ -11,7 +11,7 @@ helm install kpm kpm/kpm --namespace kpm --create-namespace \
 
 The chart does not create the bearer Secret. Name it with `secrets.existingSecret`. Examples: [helm/kpm/README.md](helm/kpm/README.md).
 
-**Image pin:** `ghcr.io/hrodrig/kpm:v1.0.0`
+**Image pin:** `ghcr.io/hrodrig/kpm:v1.1.0`
 
 Requires **metrics-server** (or equivalent Metrics API) in the cluster.
 

@@ -13,8 +13,7 @@ Create that Secret before install if it is not there yet:
   kubectl -n {{ .Release.Namespace }} create secret generic {{ .Values.secrets.existingSecret }} \
     --from-literal={{ .Values.server.tokenEnv }}="$(openssl rand -hex 32)"
 
-Do not commit the token. kpm v1.0.0 liveness is still /healthz:
-  --set probes.livenessPath=/healthz
+Do not commit the token. Liveness is /livez. Readiness is /readyz.
 {{- end }}
 
 {{- if and (eq .Values.sampler "daemon") .Values.recommend.enabled }}

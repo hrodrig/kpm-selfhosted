@@ -3,7 +3,7 @@
 
 image:
   repository: ghcr.io/hrodrig/kpm
-  # Empty uses Chart.appVersion (v1.0.0).
+  # Empty uses Chart.appVersion (v1.1.0).
   tag: ""
   pullPolicy: IfNotPresent
 
@@ -73,8 +73,8 @@ server:
   listen: "0.0.0.0:9740"
   tokenEnv: KPM_SERVER_TOKEN
 
-# Liveness is /livez. kpm v1.0.0 only serves /healthz; set livenessPath to
-# /healthz until that release exists. Readiness is already /readyz.
+# Liveness is /livez. Readiness is /readyz. kpm v1.1.0 serves both.
+# /healthz remains an alias of /livez.
 probes:
   livenessPath: /livez
   readinessPath: /readyz

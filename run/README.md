@@ -2,7 +2,7 @@
 
 This tree holds **how to run kpm**, not the CLI source. Product docs: [kpm](https://github.com/hrodrig/kpm).
 
-**Image pin (default in manifests):** `ghcr.io/hrodrig/kpm:v1.0.0`
+**Image pin (default in manifests):** `ghcr.io/hrodrig/kpm:v1.1.0`
 
 | Directory | Purpose |
 |-----------|---------|

@@ -2,7 +2,7 @@
 
 ← [Back to run/standalone](../README.md) · [run/README](../../README.md).
 
-1. Download a **Linux** tarball from **[kpm Releases](https://github.com/hrodrig/kpm/releases)** (e.g. `kpm_v1.0.0_linux_amd64.tar.gz`).
+1. Download a **Linux** tarball from **[kpm Releases](https://github.com/hrodrig/kpm/releases)** (e.g. `kpm_v1.1.0_linux_amd64.tar.gz`).
 2. Extract **`kpm`** (and optionally **`kubectl-kpm`**), then `chmod +x kpm`.
 3. Copy a profile (e.g. [kpm-minimal.yml](../../examples/kpm-minimal.yml)) and edit `store.path` / optional `scope:`.
 
