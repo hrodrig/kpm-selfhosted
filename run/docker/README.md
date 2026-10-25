@@ -2,7 +2,7 @@
 
 Run the published **distroless** image with a mounted kubeconfig, YAML profile, and SQLite store directory.
 
-**Image:** `ghcr.io/hrodrig/kpm:v0.6.0`
+**Image:** `ghcr.io/hrodrig/kpm:v1.0.0`
 
 The image has **no shell**. Mount config, kubeconfig, and data as files/dirs; pass args after the image name.
 
@@ -17,7 +17,7 @@ docker run --rm \
   -v "$HOME/.local/share/kpm:/data" \
   -e KUBECONFIG=/kube/config \
   -e KPM_SLACK_WEBHOOK \
-  ghcr.io/hrodrig/kpm:v0.6.0 \
+  ghcr.io/hrodrig/kpm:v1.0.0 \
   sample --config /config/kpm.yml
 ```
 
@@ -34,9 +34,9 @@ docker run -d --name kpm \
   -v "$HOME/.local/share/kpm:/data" \
   -e KUBECONFIG=/kube/config \
   -e KPM_SLACK_WEBHOOK \
-  -e KPM_MCP_TOKEN \
+  -e KPM_SERVER_TOKEN \
   -p 127.0.0.1:9740:9740 \
-  ghcr.io/hrodrig/kpm:v0.6.0 \
+  ghcr.io/hrodrig/kpm:v1.0.0 \
   sample --config /config/kpm.yml
 ```
 

@@ -1,0 +1,54 @@
+# Records recommendation snapshots into the daemon's SQLite file.
+# Does not mount the PVC: Azure Disk / RWO allows one pod. This Job
+# execs into deploy/kpm, which already holds the volume and the binary.
+# Apply only with deployment.yaml, never with cronjob.yaml (kpm-sample).
+#
+# Schedule is daily, including weekends, in the controller timezone
+# (usually UTC). Set spec.timeZone to the operator zone when the cluster
+# is Kubernetes 1.27+.
+#
+# kubectl pin: match the cluster minor (client/server skew is ±1).
+# registry.k8s.io/kubectl:v1.33.13 is the default here. Image entrypoint
+# is /bin/kubectl and the image runs as root.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kpm-recommend
+  namespace: kpm
+spec:
+  schedule: "0 6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 180
+      template:
+        spec:
+          serviceAccountName: kpm-recommend
+          restartPolicy: Never
+          containers:
+            - name: recommend
+              image: registry.k8s.io/kubectl:v1.33.13
+              command: ["/bin/kubectl"]
+              args:
+                - exec
+                - deploy/kpm
+                - -n
+                - kpm
+                - -c
+                - kpm
+                - --
+                - kpm
+                - recommend
+                - --record
+                - --config
+                - /config/kpm-daemon.yml
+              resources:
+                requests:
+                  cpu: 20m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi

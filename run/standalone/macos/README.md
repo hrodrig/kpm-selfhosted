@@ -8,4 +8,4 @@
 
 **One-shot / cron:** `crontab -e` with `kpm sample --config …` and `sample.interval_seconds: 0`.
 
-**Daemon:** run under `launchd` or a terminal multiplexer with `interval_seconds > 0`. Homebrew tap for **kpm** is not published yet — use the release binary or `go install github.com/hrodrig/kpm/cmd/kpm@v0.6.0`.
+**Daemon:** run under `launchd` or a terminal multiplexer with `interval_seconds > 0`. Homebrew tap for **kpm** is not published yet — use the release binary or `go install github.com/hrodrig/kpm/cmd/kpm@v1.0.0`.

@@ -1,7 +1,8 @@
-# Daemon: sample → SQLite each tick. Optional notify + MCP/server HTTP.
+# Daemon: sample → SQLite each tick. Charts and /api/v1 are on.
+# MCP is off. Uncomment the mcp block to enable it, and set KPM_MCP_TOKEN.
 # Prefer loopback listen on bastions; use 0.0.0.0 only behind a Service / proxy
 # with token_env set. Slack: set KPM_SLACK_WEBHOOK when sinks are enabled.
-# MCP bearer: set KPM_MCP_TOKEN.
+# Charts / JSON API bearer: set KPM_SERVER_TOKEN (required when listen is not loopback).
 
 cluster:
   name: "example-cluster"
@@ -36,7 +37,13 @@ recommend:
 #     - type: slack
 #       webhook_url_env: KPM_SLACK_WEBHOOK
 
-mcp:
+# mcp:
+#   enabled: true
+#   listen: "0.0.0.0:9740"
+#   token_env: KPM_MCP_TOKEN
+
+# Charts UI and /api/v1. This listen is the daemon HTTP bind.
+server:
   enabled: true
   listen: "0.0.0.0:9740"
-  token_env: KPM_MCP_TOKEN
+  token_env: KPM_SERVER_TOKEN

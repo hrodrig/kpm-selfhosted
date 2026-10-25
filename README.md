@@ -12,13 +12,9 @@
 
 Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/kpm)** — `docker run`, in-cluster CronJob/Deployment (SQLite on PVC), standalone cron/systemd. **App source and releases:** [github.com/hrodrig/kpm](https://github.com/hrodrig/kpm).
 
-> **Early development (pre-1.0).** Upstream **kpm** is under active development
-> until **v1.0.0**. Do not rely on these manifests as a sole production metrics or
-> rightsizing path before then. **Use at your own risk** — see the
-> [kpm early-development disclaimer](https://github.com/hrodrig/kpm#early-development-disclaimer)
-> (if present) and the [MIT License](./LICENSE) (software provided **“AS IS”**, no warranty).
+> **Operator snapshot.** The Version badge is this repo. The image pin below is a published [kpm](https://github.com/hrodrig/kpm) release. Manifests are examples. Software is provided **“AS IS”** — see the [MIT License](./LICENSE).
 
-**Default app image pin:** [`ghcr.io/hrodrig/kpm:v0.6.0`](https://github.com/hrodrig/kpm/releases/tag/v0.6.0).
+**Default app image pin:** [`ghcr.io/hrodrig/kpm:v1.0.0`](https://github.com/hrodrig/kpm/releases/tag/v1.0.0).
 
 **Walkthrough (DEV.to):** [kpm — Kubernetes rightsizing without Prometheus, history on your laptop](https://dev.to/hrodrig/kpm-kubernetes-rightsizing-without-prometheus-history-on-your-laptop-4272) · product screens in the [kpm README](https://github.com/hrodrig/kpm#whats-new-in-06--analyze-local-charts).
 
@@ -112,7 +108,7 @@ kpm recommend --config /tmp/kpm.yml
 
 **Goal:** one container, no Compose file. Image is **distroless** (no shell).
 
-**Image:** `ghcr.io/hrodrig/kpm:v0.6.0`
+**Image:** `ghcr.io/hrodrig/kpm:v1.0.0`
 
 ### One-shot (single sample)
 
@@ -123,7 +119,7 @@ docker run --rm \
   -v "$HOME/.local/share/kpm:/data" \
   -e KUBECONFIG=/kube/config \
   -e KPM_SLACK_WEBHOOK \
-  ghcr.io/hrodrig/kpm:v0.6.0 \
+  ghcr.io/hrodrig/kpm:v1.0.0 \
   sample --config /config/kpm.yml
 ```
 
@@ -140,9 +136,9 @@ docker run -d --name kpm \
   -v "$HOME/.local/share/kpm:/data" \
   -e KUBECONFIG=/kube/config \
   -e KPM_SLACK_WEBHOOK \
-  -e KPM_MCP_TOKEN \
+  -e KPM_SERVER_TOKEN \
   -p 127.0.0.1:9740:9740 \
-  ghcr.io/hrodrig/kpm:v0.6.0 \
+  ghcr.io/hrodrig/kpm:v1.0.0 \
   sample --config /config/kpm.yml
 ```
 
@@ -164,7 +160,7 @@ docker stop kpm && docker rm kpm
 
 **Goal:** run **kpm** in-cluster with a **ServiceAccount**, **read-only** RBAC, and a **PVC** for the SQLite store (no Helm chart in v0.1.x).
 
-**Image pin in manifests:** `ghcr.io/hrodrig/kpm:v0.6.0`
+**Image pin in manifests:** `ghcr.io/hrodrig/kpm:v1.0.0`
 
 ```bash
 kubectl apply -f run/kubernetes/manifests/namespace.yaml
@@ -175,12 +171,14 @@ kubectl apply -f run/kubernetes/manifests/configmap.yaml
 # kubectl apply -f run/kubernetes/manifests/secret.yaml
 ```
 
-Then choose **one** shape:
+Then choose **one** sampler. Both mount the same ReadWriteOnce PVC.
 
 | Shape | Manifest | ConfigMap key |
 |-------|----------|---------------|
 | Scheduled one-shot sample | [cronjob.yaml](run/kubernetes/manifests/cronjob.yaml) | `kpm.yml` (`sample.interval_seconds: 0`) |
-| Long-running daemon + Service `:9740` | [deployment.yaml](run/kubernetes/manifests/deployment.yaml) | `kpm-daemon.yml` (`interval_seconds > 0` + MCP/server listen) |
+| Long-running daemon + Service `:9740` | [deployment.yaml](run/kubernetes/manifests/deployment.yaml) | `kpm-daemon.yml` (`interval_seconds > 0`, `server.enabled`, MCP off) |
+
+With the daemon, apply [recommend-cronjob.yaml](run/kubernetes/manifests/recommend-cronjob.yaml) too. That Job does not mount the disk. It `kubectl exec`s `kpm recommend --record` into the daemon pod once a day, including weekends, so the charts and `GET /api/v1/recommendations` stay filled while an admin bastion is off. Exit code 3 (not enough samples yet) fails the Job until `min_samples` is met.
 
 Edit `scope:` / `cluster:` in the ConfigMap for your workloads. Full walkthrough: **[run/kubernetes/README.md](run/kubernetes/README.md)**.
 
@@ -193,7 +191,7 @@ Edit `scope:` / `cluster:` in the ConfigMap for your workloads. Full walkthrough
 | File | Shape |
 |------|--------|
 | [run/examples/kpm-minimal.yml](run/examples/kpm-minimal.yml) | One-shot sample (`interval_seconds: 0`) |
-| [run/examples/kpm-daemon.yml](run/examples/kpm-daemon.yml) | Daemon + MCP HTTP `/healthz` + `/metrics` |
+| [run/examples/kpm-daemon.yml](run/examples/kpm-daemon.yml) | Daemon + charts/`/api/v1` on `:9740` (MCP off) |
 
 Schema: upstream [SPECIFICATIONS.md](https://github.com/hrodrig/kpm/blob/main/SPECIFICATIONS.md) and [configs/kpm.sample.yml](https://github.com/hrodrig/kpm/blob/main/configs/kpm.sample.yml).
 
@@ -203,7 +201,7 @@ Schema: upstream [SPECIFICATIONS.md](https://github.com/hrodrig/kpm/blob/main/SP
 
 ## Secrets and notifications
 
-Notification sinks and MCP/server bearer tokens are **fail-closed** via env vars (e.g. **`KPM_SLACK_WEBHOOK`**, **`KPM_MCP_TOKEN`**) — never put secrets in committed YAML.
+Notification sinks and bearer tokens are **fail-closed** via env vars (e.g. **`KPM_SLACK_WEBHOOK`**, **`KPM_SERVER_TOKEN`**, and **`KPM_MCP_TOKEN`** only when MCP is enabled) — never put secrets in committed YAML.
 
 - Docker / standalone: export the env var (or `EnvironmentFile=` in systemd).
 - Kubernetes: copy [secret.example.yaml](run/kubernetes/manifests/secret.example.yaml), apply as Secret `kpm-secrets`, leave sinks out of the profile if unused.
@@ -219,7 +217,7 @@ run/
 ├── docker/                      # docker run notes
 ├── examples/                    # kpm-minimal.yml, kpm-daemon.yml
 ├── kubernetes/
-│   └── manifests/             # namespace, RBAC, PVC, ConfigMap, CronJob, Deployment, Secret example
+│   └── manifests/             # namespace, RBAC, PVC, ConfigMap, sample CronJob, recommend CronJob, Deployment, Secret example
 └── standalone/{linux,macos,bsd}/
 testing/
 └── scripts/                     # release-check.sh, extract-changelog.sh
