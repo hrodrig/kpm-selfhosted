@@ -2,7 +2,7 @@
 
 ## Scope
 
-- **This repo:** Operator docs, **`run/docker/`**, **`run/examples/`**, **`run/kubernetes/manifests/`**, and **`run/standalone/`**. **No** Docker Compose or Helm chart in v0.1.0.
+- **This repo:** Operator docs, **`run/docker/`**, **`run/examples/`**, **`run/kubernetes/manifests/`**, **`run/kubernetes/helm/kpm/`**, and **`run/standalone/`**. **No** Docker Compose.
 - **[hrodrig/kpm](https://github.com/hrodrig/kpm):** Go application, **`make release-check`**, tests, and container images.
 
 ## Checks

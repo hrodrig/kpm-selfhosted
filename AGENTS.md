@@ -14,9 +14,9 @@ Context and instructions for AI coding agents working on **kpm-selfhosted** (ope
 |--------------------|-----------------------------------------------------|
 | Operator README, **`run/`** | Go CLI, sample→SQLite, **`make release-check`**, packages |
 | Example YAML under **`run/examples/`** | Canonical sample: **`configs/kpm.sample.yml`** |
-| In-cluster CronJob / Deployment + PVC + RBAC | Metrics sampling, recommend, capacity, TUI, optional notify/MCP/server |
+| In-cluster CronJob / Deployment + PVC + RBAC, Helm chart | Metrics sampling, recommend, capacity, TUI, optional notify/MCP/server |
 
-**Not here (yet):** Docker Compose, Helm chart. Prefer flat manifests under **`run/kubernetes/manifests/`**.
+**Not here:** Docker Compose. Flat manifests stay under **`run/kubernetes/manifests/`**. Helm chart: **`run/kubernetes/helm/kpm/`**.
 
 **Do not** invent YAML keys in examples that the application does not support — when upstream schema changes, update **`run/examples/*.yml`** and README snippets together.
 
@@ -25,7 +25,8 @@ Context and instructions for AI coding agents working on **kpm-selfhosted** (ope
 | Name | Meaning |
 |------|---------|
 | Root **`VERSION`** + README badge + Git tag **`v*`** | Snapshot of **this** repo (docs/examples) |
-| **`ghcr.io/hrodrig/kpm:vX.Y.Z`** in docs/manifests | **kpm** application image — pin published [kpm releases](https://github.com/hrodrig/kpm/releases) only |
+| **`Chart.yaml` `version:`** | Helm package semver. Bump only when `run/kubernetes/helm/kpm/` changes. May lag repo `VERSION`. |
+| **`Chart.yaml` `appVersion`** and **`ghcr.io/hrodrig/kpm:vX.Y.Z`** | **kpm** application image — pin published [kpm releases](https://github.com/hrodrig/kpm/releases) only. Empty `image.tag` uses `appVersion`. |
 
 Do **not** bump this repo’s `VERSION` only to mirror an app tag.
 
@@ -58,6 +59,7 @@ Do **not** bump this repo’s `VERSION` only to mirror an app tag.
 - **`run/docker/`** — `docker run` notes (distroless image; mount kubeconfig + config + store volume).
 - **`run/examples/`** — operator YAML samples; must match upstream SPEC.
 - **`run/kubernetes/manifests/`** — CronJob (one-shot sample), Deployment (daemon), PVC, Service, RBAC.
+- **`run/kubernetes/helm/kpm/`** — Helm chart for the same shapes. `sampler: daemon` (default) or `cronjob`. MCP off unless `mcp.enabled`.
 - **`run/standalone/`** — binary + cron/systemd notes (linux, macos, bsd).
 - **`testing/scripts/`** — `release-check.sh`, `extract-changelog.sh`.
 

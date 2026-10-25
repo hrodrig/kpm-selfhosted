@@ -1,0 +1,50 @@
+{{- if eq .Values.sampler "cronjob" }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "kpm.fullname" . }}-sample
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kpm.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.sample.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            {{- include "kpm.selectorLabels" . | nindent 12 }}
+        spec:
+          serviceAccountName: {{ include "kpm.fullname" . }}
+          restartPolicy: Never
+          containers:
+            - name: kpm
+              image: {{ include "kpm.image" . | quote }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              args: ["sample", "--config", "/config/kpm.yml"]
+              {{- if .Values.secrets.existingSecret }}
+              envFrom:
+                - secretRef:
+                    name: {{ .Values.secrets.existingSecret }}
+                    optional: true
+              {{- end }}
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+                  readOnly: true
+                - name: store
+                  mountPath: /data
+              resources:
+                {{- toYaml .Values.resources.sample | nindent 16 }}
+          volumes:
+            - name: config
+              configMap:
+                name: {{ include "kpm.fullname" . }}-config
+            - name: store
+              persistentVolumeClaim:
+                claimName: {{ include "kpm.claimName" . }}
+{{- end }}

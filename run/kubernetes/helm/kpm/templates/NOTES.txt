@@ -1,0 +1,19 @@
+kpm {{ .Values.sampler }} is installed in {{ .Release.Namespace }}.
+Image: {{ include "kpm.image" . }}
+Store claim: {{ include "kpm.claimName" . }}
+
+{{- if eq (include "kpm.httpEnabled" .) "true" }}
+
+Charts and JSON: Service {{ include "kpm.fullname" . }} port {{ .Values.service.port }}.
+The page is at / and /ui. Bearer env {{ .Values.server.tokenEnv }} lives in Secret {{ .Values.secrets.existingSecret }}.
+MCP is {{ if .Values.mcp.enabled }}on{{ else }}off{{ end }}.
+{{- end }}
+
+{{- if and (eq .Values.sampler "daemon") .Values.recommend.enabled }}
+
+Recommend CronJob {{ include "kpm.fullname" . }}-recommend execs into the daemon pod.
+It does not mount the volume. Exit 3 until min_samples is met.
+{{- end }}
+
+One writer. Do not also apply run/kubernetes/manifests/cronjob.yaml or deployment.yaml
+against this claim.

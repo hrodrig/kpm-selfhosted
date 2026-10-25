@@ -1,6 +1,6 @@
 # Kubernetes — kpm
 
-Flat manifests under **[manifests/](manifests/)**. No Helm chart in v0.1.0.
+Flat manifests under **[manifests/](manifests/)**. Helm chart: **[helm/kpm](helm/kpm)** (`sampler: daemon` by default, MCP off).
 
 **Image pin:** `ghcr.io/hrodrig/kpm:v1.0.0`
 

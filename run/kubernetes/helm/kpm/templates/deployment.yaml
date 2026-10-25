@@ -1,0 +1,64 @@
+{{- if eq .Values.sampler "daemon" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kpm.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kpm.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "kpm.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kpm.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "kpm.fullname" . }}
+      containers:
+        - name: kpm
+          image: {{ include "kpm.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["sample", "--config", "/config/kpm-daemon.yml"]
+          {{- if eq (include "kpm.httpEnabled" .) "true" }}
+          ports:
+            - name: http
+              containerPort: 9740
+          {{- end }}
+          {{- if .Values.secrets.existingSecret }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secrets.existingSecret }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: store
+              mountPath: /data
+          {{- if eq (include "kpm.httpEnabled" .) "true" }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources.daemon | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "kpm.fullname" . }}-config
+        - name: store
+          persistentVolumeClaim:
+            claimName: {{ include "kpm.claimName" . }}
+{{- end }}

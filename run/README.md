@@ -7,7 +7,7 @@ This tree holds **how to run kpm**, not the CLI source. Product docs: [kpm](http
 | Directory | Purpose |
 |-----------|---------|
 | [docker/](docker/README.md) | Run the published image on a bastion with kubeconfig + config + store mount |
-| [kubernetes/](kubernetes/README.md) | In-cluster CronJob (one-shot sample) or Deployment (daemon) + PVC + RBAC |
+| [kubernetes/](kubernetes/README.md) | Flat manifests or Helm chart `kubernetes/helm/kpm` |
 | [standalone/](standalone/README.md) | **cron** and **systemd** using the Releases binary |
 | [examples/](examples/README.md) | Minimal operator profiles |
 

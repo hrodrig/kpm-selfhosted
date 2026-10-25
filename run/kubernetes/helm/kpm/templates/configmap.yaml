@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "kpm.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kpm.labels" . | nindent 4 }}
+data:
+  kpm.yml: |
+    cluster:
+      name: {{ .Values.config.clusterName | quote }}
+      environment: {{ .Values.config.environment | quote }}
+      description: {{ .Values.config.description | quote }}
+    kube:
+      context: ""
+    client:
+      id: {{ .Values.config.clientId | default "kpm-cron" | quote }}
+    store:
+      path: "/data/metrics.db"
+      retention_days: {{ .Values.config.retentionDays }}
+    sample:
+      interval_seconds: 0
+    recommend:
+      window_days: {{ .Values.config.windowDays }}
+      percentile: {{ .Values.config.percentile }}
+      min_samples: {{ .Values.config.minSamples }}
+      target_utilization: {{ .Values.config.targetUtilization }}
+  kpm-daemon.yml: |
+    cluster:
+      name: {{ .Values.config.clusterName | quote }}
+      environment: {{ .Values.config.environment | quote }}
+      description: {{ .Values.config.description | quote }}
+    kube:
+      context: ""
+    client:
+      id: {{ .Values.config.clientId | default "kpm-daemon" | quote }}
+    store:
+      path: "/data/metrics.db"
+      retention_days: {{ .Values.config.retentionDays }}
+    sample:
+      interval_seconds: {{ .Values.config.intervalSeconds }}
+    recommend:
+      window_days: {{ .Values.config.windowDays }}
+      percentile: {{ .Values.config.percentile }}
+      min_samples: {{ .Values.config.minSamples }}
+      target_utilization: {{ .Values.config.targetUtilization }}
+    {{- if .Values.mcp.enabled }}
+    mcp:
+      enabled: true
+      listen: {{ .Values.mcp.listen | quote }}
+      token_env: {{ .Values.mcp.tokenEnv | quote }}
+    {{- end }}
+    {{- if .Values.server.enabled }}
+    server:
+      enabled: true
+      listen: {{ .Values.server.listen | quote }}
+      token_env: {{ .Values.server.tokenEnv | quote }}
+    {{- end }}

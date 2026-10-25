@@ -1,0 +1,47 @@
+{{- if and (eq .Values.sampler "daemon") .Values.recommend.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "kpm.fullname" . }}-recommend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kpm.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.recommend.schedule | quote }}
+  {{- if .Values.recommend.timeZone }}
+  timeZone: {{ .Values.recommend.timeZone | quote }}
+  {{- end }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: {{ .Values.recommend.activeDeadlineSeconds }}
+      template:
+        metadata:
+          labels:
+            {{- include "kpm.selectorLabels" . | nindent 12 }}
+        spec:
+          serviceAccountName: {{ include "kpm.fullname" . }}-recommend
+          restartPolicy: Never
+          containers:
+            - name: recommend
+              image: {{ .Values.recommend.kubectlImage | quote }}
+              command: ["/bin/kubectl"]
+              args:
+                - exec
+                - deploy/{{ include "kpm.fullname" . }}
+                - -n
+                - {{ .Release.Namespace }}
+                - -c
+                - kpm
+                - --
+                - kpm
+                - recommend
+                - --record
+                - --config
+                - /config/kpm-daemon.yml
+              resources:
+                {{- toYaml .Values.resources.recommend | nindent 16 }}
+{{- end }}

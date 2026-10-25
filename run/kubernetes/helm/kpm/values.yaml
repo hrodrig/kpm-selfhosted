@@ -1,0 +1,97 @@
+# Chart package version is Chart.yaml version. App image is appVersion
+# unless image.tag is set. Repo VERSION of kpm-selfhosted is a third number.
+
+image:
+  repository: ghcr.io/hrodrig/kpm
+  # Empty uses Chart.appVersion (v1.0.0).
+  tag: ""
+  pullPolicy: IfNotPresent
+
+# daemon: Deployment owns the PVC and serves charts + /api/v1.
+# cronjob: one-shot sample CronJob owns the PVC. No Deployment, no recommend Job.
+sampler: daemon
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+
+rbac:
+  create: true
+
+persistence:
+  enabled: true
+  existingClaim: ""
+  size: 5Gi
+  accessMode: ReadWriteOnce
+  storageClass: ""
+
+config:
+  clusterName: in-cluster
+  environment: prod
+  description: kpm helm sampler
+  # Empty uses kpm-daemon or kpm-cron from the sampler.
+  clientId: ""
+  retentionDays: 45
+  intervalSeconds: 300
+  windowDays: 7
+  percentile: 95
+  minSamples: 24
+  targetUtilization: 0.70
+
+# Charts UI and GET /api/v1. Off by setting enabled false (probes and Service go with it).
+server:
+  enabled: true
+  listen: "0.0.0.0:9740"
+  tokenEnv: KPM_SERVER_TOKEN
+
+# Off unless the operator turns it on. Same listen as server when both are on.
+mcp:
+  enabled: false
+  listen: "0.0.0.0:9740"
+  tokenEnv: KPM_MCP_TOKEN
+
+# Required when server.enabled or mcp.enabled. The chart does not create the Secret.
+secrets:
+  existingSecret: ""
+
+service:
+  type: ClusterIP
+  port: 9740
+
+# Only with sampler daemon. Exec into the daemon pod; does not mount the PVC.
+recommend:
+  enabled: true
+  schedule: "0 6 * * *"
+  # Empty omits timeZone (controller timezone, usually UTC). Needs Kubernetes 1.27+ when set.
+  timeZone: ""
+  kubectlImage: registry.k8s.io/kubectl:v1.33.13
+  activeDeadlineSeconds: 180
+
+sample:
+  schedule: "*/5 * * * *"
+
+resources:
+  daemon:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  sample:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  recommend:
+    requests:
+      cpu: 20m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi

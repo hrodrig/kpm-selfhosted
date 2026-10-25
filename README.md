@@ -182,6 +182,21 @@ With the daemon, apply [recommend-cronjob.yaml](run/kubernetes/manifests/recomme
 
 Edit `scope:` / `cluster:` in the ConfigMap for your workloads. Full walkthrough: **[run/kubernetes/README.md](run/kubernetes/README.md)**.
 
+### Helm
+
+Chart: [run/kubernetes/helm/kpm](run/kubernetes/helm/kpm). Package `version` is the chart. `appVersion` is the kpm image (`v1.0.0` when `image.tag` is empty). Repo `VERSION` stays the docs snapshot.
+
+```bash
+kubectl -n kpm create secret generic kpm-secrets \
+  --from-literal=KPM_SERVER_TOKEN="$(openssl rand -hex 32)"
+
+helm install kpm run/kubernetes/helm/kpm \
+  --namespace kpm --create-namespace \
+  --set secrets.existingSecret=kpm-secrets
+```
+
+Default `sampler` is `daemon` (one replica, RWO PVC, charts on `:9740`, MCP off). `sampler=cronjob` is the one-shot sample Job and does not render the Deployment. The recommend CronJob execs into the daemon and does not mount the disk. Do not install the chart and the flat manifests against the same claim.
+
 **[↑ Contents](#table-of-contents)**
 
 ---
