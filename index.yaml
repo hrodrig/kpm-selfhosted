@@ -1,0 +1,21 @@
+apiVersion: v1
+entries:
+  kpm:
+  - apiVersion: v2
+    appVersion: v1.1.0
+    created: "2026-10-25T19:37:47.929358538Z"
+    description: In-cluster kpm sampler. One RWO volume, one writer.
+    digest: 512db2d4a45e2766b7f0d399a48f5d5ae80d08f27e19beaea3bdf15536a695df
+    home: https://github.com/hrodrig/kpm-selfhosted
+    maintainers:
+    - name: hrodrig
+      url: https://github.com/hrodrig
+    name: kpm
+    sources:
+    - https://github.com/hrodrig/kpm-selfhosted
+    - https://github.com/hrodrig/kpm
+    type: application
+    urls:
+    - https://github.com/hrodrig/kpm-selfhosted/releases/download/kpm-0.1.0/kpm-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-10-25T19:37:47.929363257Z"
