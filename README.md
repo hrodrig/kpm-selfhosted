@@ -1,6 +1,6 @@
 # kpm-selfhosted
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/hrodrig/kpm-selfhosted/releases)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue)](https://github.com/hrodrig/kpm-selfhosted/releases)
 [![Release](https://img.shields.io/github/v/release/hrodrig/kpm-selfhosted?label=release)](https://github.com/hrodrig/kpm-selfhosted/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![App image on GHCR](https://img.shields.io/badge/image-ghcr.io%2Fhrodrig%2Fkpm-2496ED?logo=github)](https://github.com/hrodrig/kpm/pkgs/container/kpm)
