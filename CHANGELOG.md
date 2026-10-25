@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-25
+
 ### Added
 
 - Helm chart `run/kubernetes/helm/kpm` (package `0.1.0`, `appVersion` `v1.1.0`). Daemon is the default. MCP stays off. The recommend CronJob execs into the daemon pod and does not mount the PVC. `affinity` schedules the sampler pod and the recommend Job. Daemon container resources are the top-level `resources` object. Pods run as distroless nonroot (65532) with a read-only root filesystem, dropped capabilities, and RuntimeDefault seccomp. `imagePullSecrets` is optional. Liveness probe is `/livez` (readiness stays `/readyz`), matching kpm v1.1.0. `secrets.existingSecret` is documented with create examples in the chart README, values, and install notes.
@@ -32,5 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default application image pin: `ghcr.io/hrodrig/kpm:v0.6.0`.
 - README aligned with the hrodrig selfhosted family (TOC, pick-a-path sections, layout, community policies/standards, gghstats clones badge).
 
-[Unreleased]: https://github.com/hrodrig/kpm-selfhosted/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/hrodrig/kpm-selfhosted/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/hrodrig/kpm-selfhosted/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/hrodrig/kpm-selfhosted/releases/tag/v0.1.0
