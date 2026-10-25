@@ -1,6 +1,15 @@
 # Kubernetes — kpm
 
-Flat manifests under **[manifests/](manifests/)**. Helm chart: **[helm/kpm](helm/kpm)** (`sampler: daemon` by default, MCP off). The chart does not create the bearer Secret. Name it with `secrets.existingSecret`. Examples: [helm/kpm/README.md](helm/kpm/README.md).
+Flat manifests under **[manifests/](manifests/)**. Helm chart: **[helm/kpm](helm/kpm)** (`sampler: daemon` by default, MCP off). Install from the published repo, not from a checkout path:
+
+```bash
+helm repo add kpm https://hrodrig.github.io/kpm-selfhosted/
+helm repo update
+helm install kpm kpm/kpm --namespace kpm --create-namespace \
+  --set secrets.existingSecret=kpm-secrets
+```
+
+The chart does not create the bearer Secret. Name it with `secrets.existingSecret`. Examples: [helm/kpm/README.md](helm/kpm/README.md).
 
 **Image pin:** `ghcr.io/hrodrig/kpm:v1.0.0`
 

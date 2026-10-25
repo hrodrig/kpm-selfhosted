@@ -14,7 +14,7 @@
 
 1. Work on **`develop`**; merge to **`main`** when ready.
 2. Bump **`VERSION`**, **`CHANGELOG.md`**, and the README **Version** badge together.
-3. On **`main`**: **`git tag -a v0.1.0 -m "kpm-selfhosted 0.1.0"`** and **`git push origin v0.1.0`**. [**Release**](.github/workflows/release.yml) creates the GitHub Release from the matching **`CHANGELOG`** section.
+3. On **`main`**: **`git tag -a v0.1.0 -m "kpm-selfhosted 0.1.0"`** and **`git push origin v0.1.0`**. [**Release**](.github/workflows/release.yml) creates the GitHub Release from the matching **`CHANGELOG`** section. The same tag runs [**Release Charts**](.github/workflows/release-charts.yml): chart-releaser publishes `kpm-<chartVersion>` and the `gh-pages` Helm index. Pages source is the `gh-pages` branch, folder `/`.
 4. To refresh notes for an existing tag: **Actions → Release → Run workflow** with the tag name.
 
 ## Pull requests

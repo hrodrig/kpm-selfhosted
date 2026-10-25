@@ -57,7 +57,7 @@ Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/k
 | **Binary only** (no Docker) | [Standalone binary](#standalone-binary) — Linux: [cron / systemd](run/standalone/linux/README.md) |
 | **Single container** (`docker run`) | [Docker single container](#docker-single-container) |
 | **Kubernetes, scheduled sample** | [Kubernetes manifests](#kubernetes-manifests) — [cronjob.yaml](run/kubernetes/manifests/cronjob.yaml) or Helm `sampler=cronjob` |
-| **Kubernetes, daemon** | Flat [deployment.yaml](run/kubernetes/manifests/deployment.yaml) (probe `/healthz` on image `v1.0.0`) or the [Helm chart](#helm) |
+| **Kubernetes, daemon** | Flat [deployment.yaml](run/kubernetes/manifests/deployment.yaml) or the [Helm chart](#helm). Liveness is `/livez`. Image `v1.0.0` still answers `/healthz`. |
 | **Starter YAML** | [Example profiles](#example-profiles) |
 
 Deeper index: **[`run/README.md`](run/README.md)**.
@@ -142,7 +142,7 @@ docker run -d --name kpm \
   sample --config /config/kpm.yml
 ```
 
-**Check:** `curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:9740/healthz` (expect `200` when MCP/server listen is enabled).
+**Check:** `curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:9740/livez` (expect `200` when MCP/server listen is enabled). Image `v1.0.0` answers `/healthz` until the next app release.
 
 **Remove:**
 
@@ -192,7 +192,9 @@ Chart: [run/kubernetes/helm/kpm](run/kubernetes/helm/kpm). Package `version` is 
 kubectl -n kpm create secret generic kpm-secrets \
   --from-literal=KPM_SERVER_TOKEN="$(openssl rand -hex 32)"
 
-helm install kpm run/kubernetes/helm/kpm \
+helm repo add kpm https://hrodrig.github.io/kpm-selfhosted/
+helm repo update
+helm install kpm kpm/kpm \
   --namespace kpm --create-namespace \
   --set secrets.existingSecret=kpm-secrets
 ```
@@ -200,13 +202,15 @@ helm install kpm run/kubernetes/helm/kpm \
 Against image `v1.0.0`, liveness is still `/healthz`:
 
 ```bash
-helm install kpm run/kubernetes/helm/kpm \
+helm install kpm kpm/kpm \
   --namespace kpm --create-namespace \
   --set secrets.existingSecret=kpm-secrets \
   --set probes.livenessPath=/healthz
 ```
 
 Default `sampler` is `daemon` (one replica, RWO PVC, charts on `:9740`, MCP off). `sampler=cronjob` is the one-shot sample Job and does not render the Deployment. The recommend CronJob execs into the daemon and does not mount the disk. Do not install the chart and the flat manifests against the same claim.
+
+A repo tag `v*` runs [Release Charts](.github/workflows/release-charts.yml). chart-releaser publishes GitHub Release `kpm-<chartVersion>` and the `gh-pages` index (`https://hrodrig.github.io/kpm-selfhosted`). That is separate from the docs Release for the same git tag. Set GitHub Pages to branch `gh-pages`, folder `/`. Do not edit `gh-pages` by hand. The job packages a chart only when that tag's diff touches `run/kubernetes/helm/`.
 
 **[↑ Contents](#table-of-contents)**
 

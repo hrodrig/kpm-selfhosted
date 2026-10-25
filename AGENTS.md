@@ -34,13 +34,14 @@ Do **not** bump this repo’s `VERSION` only to mirror an app tag.
 
 - **`make release-check`** — VERSION semver, README **Version** badge, CHANGELOG section for current VERSION. Script: **`testing/scripts/release-check.sh`**.
 - **`make helm-lint`** — `helm lint` and `helm template` for the daemon and the one-shot CronJob shapes. CI: **`.github/workflows/helm-lint.yml`**.
+- **Chart publish:** **`.github/workflows/release-charts.yml`** on a `v*` tag (and `workflow_dispatch`). chart-releaser writes GitHub Release `kpm-<chartVersion>` and the `gh-pages` index. It does not replace **`release.yml`** (docs Release for the git tag). Do not hand-edit `gh-pages`. A tag whose diff does not touch `run/kubernetes/helm/` succeeds with “No chart changes detected”.
 
 **Application gate:** clone **kpm** and run **`make release-check`** there before tagging an upstream app release.
 
 ## Git flow
 
 - **Branches:** Work on **`develop`**. Topic branch → **PR into `develop`**. Release snapshot: **PR `develop` → `main`**, then annotated tag **`v<semver>`** on **`main`**.
-- **Never** merge to **`main`**, create/push a release tag, or trigger [**.github/workflows/release.yml**](.github/workflows/release.yml) **without explicit user approval**.
+- **Never** merge to **`main`**, create/push a release tag, or trigger [**.github/workflows/release.yml**](.github/workflows/release.yml) or [**.github/workflows/release-charts.yml**](.github/workflows/release-charts.yml) **without explicit user approval**.
 - **Commits:** Show the proposed commit message and wait for user approval before `git commit`.
 - **Language:** English only for code, comments, commit messages, docs, and README.
 

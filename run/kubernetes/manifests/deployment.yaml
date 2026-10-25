@@ -38,7 +38,8 @@ spec:
               mountPath: /data
           livenessProbe:
             httpGet:
-              path: /healthz
+              # /livez. Image v1.0.0 still answers /healthz (kpm#141).
+              path: /livez
               port: http
             initialDelaySeconds: 15
             periodSeconds: 30

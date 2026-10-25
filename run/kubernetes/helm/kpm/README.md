@@ -34,15 +34,9 @@ secrets:
 ```
 
 ```bash
-helm install kpm . \
-  --namespace kpm --create-namespace \
-  --set secrets.existingSecret=kpm-secrets
-```
-
-The same flag works from a checkout of this repo:
-
-```bash
-helm install kpm run/kubernetes/helm/kpm \
+helm repo add kpm https://hrodrig.github.io/kpm-selfhosted/
+helm repo update
+helm install kpm kpm/kpm \
   --namespace kpm --create-namespace \
   --set secrets.existingSecret=kpm-secrets
 ```

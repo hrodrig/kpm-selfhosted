@@ -25,7 +25,7 @@ Omit `KPM_SLACK_WEBHOOK` when the profile has no notification sinks.
 
 ## Daemon (interval_seconds > 0)
 
-Use a profile with `sample.interval_seconds > 0` (see [kpm-daemon.yml](../examples/kpm-daemon.yml)). Publish the HTTP port only if MCP/server listen is set and you scrape `/healthz` / `/metrics`.
+Use a profile with `sample.interval_seconds > 0` (see [kpm-daemon.yml](../examples/kpm-daemon.yml)). Publish the HTTP port only if MCP/server listen is set and you scrape `/livez` / `/metrics`. Image `v1.0.0` answers `/healthz`.
 
 ```bash
 docker run -d --name kpm \
