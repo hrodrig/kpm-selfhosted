@@ -1,8 +1,10 @@
-# Private registry — no egress from AKS
+# Private registry — cluster with no egress
 
-Some customers forbid outbound traffic from the AKS cluster and from the admin bastion. Those hosts cannot `helm repo add` the public chart site and cannot pull `ghcr.io` or `registry.k8s.io`. Mirror the chart and the images once, from a machine that **does** have egress, into a registry the cluster can reach. After that, install and run only talk to that registry.
+A private cluster often blocks outbound traffic from the nodes and from the admin bastion. AKS is one example. The same steps apply to any cluster that cannot reach the public chart site, `ghcr.io`, or `registry.k8s.io`.
 
-The names below are a stand-in. A real Azure Container Registry host is `<name>.azurecr.io`.
+Mirror the chart and the images once, from a machine that **does** have egress, into a registry the cluster can reach. After that, install and run only talk to that registry.
+
+The names below are a stand-in for one private Azure Container Registry. A real ACR host is `<name>.azurecr.io`. Harbor, Artifactory, or any other OCI registry uses the same chart path and image path: `oci://<registry>/helm/kpm` and `<registry>/customer/kpm`.
 
 | What | Public source | Private example |
 |------|----------------|-----------------|
@@ -19,7 +21,7 @@ sequenceDiagram
   participant Pub as Public chart and images
   participant Reg as my-private.azcr.io
   participant API as Kubernetes API
-  participant Node as AKS node
+  participant Node as Cluster node
 
   Note over API,Node: No route to the public internet
   Op->>Pub: helm pull kpm/kpm --version 0.1.0
@@ -41,7 +43,7 @@ docker login my-private.azcr.io
 helm registry login my-private.azcr.io
 ```
 
-On AKS, attaching the registry to the cluster (`az aks update --attach-acr`) lets kubelet pull without an `imagePullSecrets` entry. The chart still accepts `imagePullSecrets` when the cluster is not attached.
+How the kubelet authenticates is specific to the cluster. On AKS, attaching the registry (`az aks update --attach-acr`) is one way to pull without a pull secret. The chart accepts `imagePullSecrets` when the cluster has no built-in registry integration.
 
 ## 2. Chart
 
