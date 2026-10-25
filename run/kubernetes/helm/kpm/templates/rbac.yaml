@@ -1,0 +1,70 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kpm.fullname" . }}-{{ .Release.Namespace }}-reader
+  labels:
+    {{- include "kpm.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "namespaces"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets", "statefulsets", "daemonsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "kpm.fullname" . }}-{{ .Release.Namespace }}-reader
+  labels:
+    {{- include "kpm.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "kpm.fullname" . }}-{{ .Release.Namespace }}-reader
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kpm.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+{{- if and (eq .Values.sampler "daemon") .Values.recommend.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "kpm.fullname" . }}-recommend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kpm.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get"]
+    resourceNames: ["{{ include "kpm.fullname" . }}"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "kpm.fullname" . }}-recommend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kpm.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "kpm.fullname" . }}-recommend
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kpm.fullname" . }}-recommend
+    namespace: {{ .Release.Namespace }}
+{{- end }}
+{{- end }}

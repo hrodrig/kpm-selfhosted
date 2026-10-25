@@ -21,7 +21,7 @@ spec:
       serviceAccountName: kpm
       containers:
         - name: kpm
-          image: ghcr.io/hrodrig/kpm:v1.0.0
+          image: ghcr.io/hrodrig/kpm:v1.1.0
           args: ["sample", "--config", "/config/kpm-daemon.yml"]
           ports:
             - name: http
@@ -38,7 +38,7 @@ spec:
               mountPath: /data
           livenessProbe:
             httpGet:
-              path: /healthz
+              path: /livez
               port: http
             initialDelaySeconds: 15
             periodSeconds: 30

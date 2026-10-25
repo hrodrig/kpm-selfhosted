@@ -2,19 +2,19 @@
 
 ## Scope
 
-- **This repo:** Operator docs, **`run/docker/`**, **`run/examples/`**, **`run/kubernetes/manifests/`**, and **`run/standalone/`**. **No** Docker Compose or Helm chart in v0.1.0.
+- **This repo:** Operator docs, **`run/docker/`**, **`run/examples/`**, **`run/kubernetes/manifests/`**, **`run/kubernetes/helm/kpm/`**, and **`run/standalone/`**. **No** Docker Compose.
 - **[hrodrig/kpm](https://github.com/hrodrig/kpm):** Go application, **`make release-check`**, tests, and container images.
 
 ## Checks
 
-- **This repo:** **`make release-check`** (VERSION, README badge, CHANGELOG section) — same gate as [CI](.github/workflows/ci.yml).
+- **This repo:** **`make release-check`** (VERSION, README badge, CHANGELOG section) and **`make helm-lint`**. CI: [release-check](.github/workflows/ci.yml) and [helm-lint](.github/workflows/helm-lint.yml).
 - **kpm application:** clone **[hrodrig/kpm](https://github.com/hrodrig/kpm)** and run **`make release-check`** there.
 
 ## Releases
 
 1. Work on **`develop`**; merge to **`main`** when ready.
 2. Bump **`VERSION`**, **`CHANGELOG.md`**, and the README **Version** badge together.
-3. On **`main`**: **`git tag -a v0.1.0 -m "kpm-selfhosted 0.1.0"`** and **`git push origin v0.1.0`**. [**Release**](.github/workflows/release.yml) creates the GitHub Release from the matching **`CHANGELOG`** section.
+3. On **`main`**: **`git tag -a v0.1.0 -m "kpm-selfhosted 0.1.0"`** and **`git push origin v0.1.0`**. [**Release**](.github/workflows/release.yml) creates the GitHub Release from the matching **`CHANGELOG`** section. The same tag runs [**Release Charts**](.github/workflows/release-charts.yml): chart-releaser publishes `kpm-<chartVersion>` and the `gh-pages` Helm index. Pages source is the `gh-pages` branch, folder `/`.
 4. To refresh notes for an existing tag: **Actions → Release → Run workflow** with the tag name.
 
 ## Pull requests

@@ -14,7 +14,7 @@ Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/k
 
 > **Operator snapshot.** The Version badge is this repo. The image pin below is a published [kpm](https://github.com/hrodrig/kpm) release. Manifests are examples. Software is provided **“AS IS”** — see the [MIT License](./LICENSE).
 
-**Default app image pin:** [`ghcr.io/hrodrig/kpm:v1.0.0`](https://github.com/hrodrig/kpm/releases/tag/v1.0.0).
+**Default app image pin:** [`ghcr.io/hrodrig/kpm:v1.1.0`](https://github.com/hrodrig/kpm/releases/tag/v1.1.0).
 
 **Walkthrough (DEV.to):** [kpm — Kubernetes rightsizing without Prometheus, history on your laptop](https://dev.to/hrodrig/kpm-kubernetes-rightsizing-without-prometheus-history-on-your-laptop-4272) · product screens in the [kpm README](https://github.com/hrodrig/kpm#whats-new-in-06--analyze-local-charts).
 
@@ -56,8 +56,8 @@ Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/k
 |-----------|---------|
 | **Binary only** (no Docker) | [Standalone binary](#standalone-binary) — Linux: [cron / systemd](run/standalone/linux/README.md) |
 | **Single container** (`docker run`) | [Docker single container](#docker-single-container) |
-| **Kubernetes, scheduled sample** | [Kubernetes manifests](#kubernetes-manifests) — [cronjob.yaml](run/kubernetes/manifests/cronjob.yaml) |
-| **Kubernetes, daemon** (`interval_seconds > 0` + `/healthz`) | [Kubernetes manifests](#kubernetes-manifests) — [deployment.yaml](run/kubernetes/manifests/deployment.yaml) |
+| **Kubernetes, scheduled sample** | [Kubernetes manifests](#kubernetes-manifests) — [cronjob.yaml](run/kubernetes/manifests/cronjob.yaml) or Helm `sampler=cronjob` |
+| **Kubernetes, daemon** | Flat [deployment.yaml](run/kubernetes/manifests/deployment.yaml) or the [Helm chart](#helm). Liveness is `/livez`. |
 | **Starter YAML** | [Example profiles](#example-profiles) |
 
 Deeper index: **[`run/README.md`](run/README.md)**.
@@ -75,7 +75,7 @@ Deeper index: **[`run/README.md`](run/README.md)**.
 | Example profiles under **`run/examples/`** | Canonical sample: **`configs/kpm.sample.yml`** |
 | Docs CI (`make release-check`) | govulncheck, grype, GoReleaser, Cosign, SBOM |
 
-**Not shipped here (yet):** Docker Compose, Helm chart, kind e2e. Prefer flat manifests under **`run/kubernetes/manifests/`**.
+**Not shipped here:** Docker Compose, kind e2e. Flat manifests: **`run/kubernetes/manifests/`**. Helm chart: **`run/kubernetes/helm/kpm/`**.
 
 **[↑ Contents](#table-of-contents)**
 
@@ -108,7 +108,7 @@ kpm recommend --config /tmp/kpm.yml
 
 **Goal:** one container, no Compose file. Image is **distroless** (no shell).
 
-**Image:** `ghcr.io/hrodrig/kpm:v1.0.0`
+**Image:** `ghcr.io/hrodrig/kpm:v1.1.0`
 
 ### One-shot (single sample)
 
@@ -119,7 +119,7 @@ docker run --rm \
   -v "$HOME/.local/share/kpm:/data" \
   -e KUBECONFIG=/kube/config \
   -e KPM_SLACK_WEBHOOK \
-  ghcr.io/hrodrig/kpm:v1.0.0 \
+  ghcr.io/hrodrig/kpm:v1.1.0 \
   sample --config /config/kpm.yml
 ```
 
@@ -138,11 +138,11 @@ docker run -d --name kpm \
   -e KPM_SLACK_WEBHOOK \
   -e KPM_SERVER_TOKEN \
   -p 127.0.0.1:9740:9740 \
-  ghcr.io/hrodrig/kpm:v1.0.0 \
+  ghcr.io/hrodrig/kpm:v1.1.0 \
   sample --config /config/kpm.yml
 ```
 
-**Check:** `curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:9740/healthz` (expect `200` when MCP/server listen is enabled).
+**Check:** `curl -sS -o /dev/null -w '%{http_code}\n' http://127.0.0.1:9740/livez` (expect `200` when MCP/server listen is enabled).
 
 **Remove:**
 
@@ -158,9 +158,9 @@ docker stop kpm && docker rm kpm
 
 ## Kubernetes manifests
 
-**Goal:** run **kpm** in-cluster with a **ServiceAccount**, **read-only** RBAC, and a **PVC** for the SQLite store (no Helm chart in v0.1.x).
+**Goal:** run **kpm** in-cluster with a **ServiceAccount**, **read-only** RBAC, and a **PVC** for the SQLite store. Flat manifests or the Helm chart.
 
-**Image pin in manifests:** `ghcr.io/hrodrig/kpm:v1.0.0`
+**Image pin in manifests:** `ghcr.io/hrodrig/kpm:v1.1.0`
 
 ```bash
 kubectl apply -f run/kubernetes/manifests/namespace.yaml
@@ -181,6 +181,27 @@ Then choose **one** sampler. Both mount the same ReadWriteOnce PVC.
 With the daemon, apply [recommend-cronjob.yaml](run/kubernetes/manifests/recommend-cronjob.yaml) too. That Job does not mount the disk. It `kubectl exec`s `kpm recommend --record` into the daemon pod once a day, including weekends, so the charts and `GET /api/v1/recommendations` stay filled while an admin bastion is off. Exit code 3 (not enough samples yet) fails the Job until `min_samples` is met.
 
 Edit `scope:` / `cluster:` in the ConfigMap for your workloads. Full walkthrough: **[run/kubernetes/README.md](run/kubernetes/README.md)**.
+
+### Helm
+
+Chart: [run/kubernetes/helm/kpm](run/kubernetes/helm/kpm). Package `version` is the chart. `appVersion` is the kpm image (`v1.1.0` when `image.tag` is empty). Repo `VERSION` stays the docs snapshot. Secret contract and examples: [chart README](run/kubernetes/helm/kpm/README.md).
+
+`secrets.existingSecret` is the name of a Secret you create. The chart does not create it and does not accept the token in values. With the daemon and `server.enabled`, install fails if the name is empty. The Deployment loads every key via `envFrom`. `KPM_SERVER_TOKEN` is the charts bearer.
+
+```bash
+kubectl -n kpm create secret generic kpm-secrets \
+  --from-literal=KPM_SERVER_TOKEN="$(openssl rand -hex 32)"
+
+helm repo add kpm https://hrodrig.github.io/kpm-selfhosted/
+helm repo update
+helm install kpm kpm/kpm \
+  --namespace kpm --create-namespace \
+  --set secrets.existingSecret=kpm-secrets
+```
+
+Default `sampler` is `daemon` (one replica, RWO PVC, charts on `:9740`, MCP off). `sampler=cronjob` is the one-shot sample Job and does not render the Deployment. The recommend CronJob execs into the daemon and does not mount the disk. Do not install the chart and the flat manifests against the same claim.
+
+A repo tag `v*` runs [Release Charts](.github/workflows/release-charts.yml). chart-releaser publishes GitHub Release `kpm-<chartVersion>` and the `gh-pages` index (`https://hrodrig.github.io/kpm-selfhosted`). That is separate from the docs Release for the same git tag. Set GitHub Pages to branch `gh-pages`, folder `/`. Do not edit `gh-pages` by hand. The job packages a chart only when that tag's diff touches `run/kubernetes/helm/`.
 
 **[↑ Contents](#table-of-contents)**
 
@@ -204,7 +225,8 @@ Schema: upstream [SPECIFICATIONS.md](https://github.com/hrodrig/kpm/blob/main/SP
 Notification sinks and bearer tokens are **fail-closed** via env vars (e.g. **`KPM_SLACK_WEBHOOK`**, **`KPM_SERVER_TOKEN`**, and **`KPM_MCP_TOKEN`** only when MCP is enabled) — never put secrets in committed YAML.
 
 - Docker / standalone: export the env var (or `EnvironmentFile=` in systemd).
-- Kubernetes: copy [secret.example.yaml](run/kubernetes/manifests/secret.example.yaml), apply as Secret `kpm-secrets`, leave sinks out of the profile if unused.
+- Kubernetes manifests: copy [secret.example.yaml](run/kubernetes/manifests/secret.example.yaml), apply as Secret `kpm-secrets`, leave sinks out of the profile if unused.
+- Helm: the chart does not create that Secret. Pass its name as `secrets.existingSecret`. See [chart README](run/kubernetes/helm/kpm/README.md).
 
 **[↑ Contents](#table-of-contents)**
 
@@ -217,12 +239,13 @@ run/
 ├── docker/                      # docker run notes
 ├── examples/                    # kpm-minimal.yml, kpm-daemon.yml
 ├── kubernetes/
-│   └── manifests/             # namespace, RBAC, PVC, ConfigMap, sample CronJob, recommend CronJob, Deployment, Secret example
+│   ├── manifests/             # namespace, RBAC, PVC, ConfigMap, sample CronJob, recommend CronJob, Deployment, Secret example
+│   └── helm/kpm/              # Helm chart (daemon default, MCP off)
 └── standalone/{linux,macos,bsd}/
 testing/
 └── scripts/                     # release-check.sh, extract-changelog.sh
 assets/                          # README hero + product captures (TUI / serve / flow)
-Makefile                         # release-check
+Makefile                         # release-check, helm-lint
 ```
 
 Maintainers: **`make release-check`** before tagging — see **[CONTRIBUTING.md](CONTRIBUTING.md)**.

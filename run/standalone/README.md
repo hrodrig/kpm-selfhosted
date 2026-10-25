@@ -11,6 +11,6 @@ Run **kpm** from a [release tarball](https://github.com/hrodrig/kpm/releases) (o
 **Shapes:**
 
 - **One-shot sample:** `sample.interval_seconds: 0` — suitable for cron.
-- **Daemon:** `sample.interval_seconds > 0` — long-lived process; optional MCP/server listen for `/healthz` and `/metrics`.
+- **Daemon:** `sample.interval_seconds > 0` — long-lived process; optional MCP/server listen for `/livez` and `/metrics`.
 
 Starter configs: [../examples/](../examples/README.md). Keep `store.path` on durable disk.

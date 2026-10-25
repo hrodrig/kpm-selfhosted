@@ -1,0 +1,141 @@
+# Chart package version is Chart.yaml version. App image is appVersion
+# unless image.tag is set. Repo VERSION of kpm-selfhosted is a third number.
+
+image:
+  repository: ghcr.io/hrodrig/kpm
+  # Empty uses Chart.appVersion (v1.1.0).
+  tag: ""
+  pullPolicy: IfNotPresent
+
+# Optional. Empty omits imagePullSecrets.
+# - name: ghcr-pull
+imagePullSecrets: []
+
+# Matches gcr.io/distroless/static-debian13:nonroot (uid/gid 65532).
+# fsGroup lets that user create the SQLite file on the PVC.
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  fsGroupChangePolicy: OnRootMismatch
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# daemon: Deployment owns the PVC and serves charts + /api/v1.
+# cronjob: one-shot sample CronJob owns the PVC. No Deployment, no recommend Job.
+sampler: daemon
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+
+# Scheduling for the sampler pod and the recommend Job. Empty omits the field.
+# nodeAffinity / podAffinity / podAntiAffinity live under this object.
+affinity: {}
+
+rbac:
+  create: true
+
+persistence:
+  enabled: true
+  existingClaim: ""
+  size: 5Gi
+  accessMode: ReadWriteOnce
+  storageClass: ""
+
+config:
+  clusterName: in-cluster
+  environment: prod
+  description: kpm helm sampler
+  # Empty uses kpm-daemon or kpm-cron from the sampler.
+  clientId: ""
+  retentionDays: 45
+  intervalSeconds: 300
+  windowDays: 7
+  percentile: 95
+  minSamples: 24
+  targetUtilization: 0.70
+
+# Charts UI and GET /api/v1. Off by setting enabled false (probes and Service go with it).
+server:
+  enabled: true
+  listen: "0.0.0.0:9740"
+  tokenEnv: KPM_SERVER_TOKEN
+
+# Liveness is /livez. Readiness is /readyz. kpm v1.1.0 serves both.
+# /healthz remains an alias of /livez.
+probes:
+  livenessPath: /livez
+  readinessPath: /readyz
+
+# Off unless the operator turns it on. Same listen as server when both are on.
+mcp:
+  enabled: false
+  listen: "0.0.0.0:9740"
+  tokenEnv: KPM_MCP_TOKEN
+
+# Name of a Secret that already exists in the release namespace.
+# The chart does not create it. The daemon mounts every key with envFrom.
+# Required when sampler is daemon and server.enabled or mcp.enabled is true.
+# Install fails if this is empty in that case.
+#
+#   kubectl -n kpm create secret generic kpm-secrets \
+#     --from-literal=KPM_SERVER_TOKEN="$(openssl rand -hex 32)"
+#
+#   secrets:
+#     existingSecret: kpm-secrets
+#
+# Add KPM_MCP_TOKEN to that Secret only when mcp.enabled is true.
+# Do not put the token in this file.
+secrets:
+  existingSecret: ""
+
+service:
+  type: ClusterIP
+  port: 9740
+
+# Container resources for the daemon. Sample and recommend Jobs have their own.
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Only with sampler daemon. Exec into the daemon pod; does not mount the PVC.
+recommend:
+  enabled: true
+  schedule: "0 6 * * *"
+  # Empty omits timeZone (controller timezone, usually UTC). Needs Kubernetes 1.27+ when set.
+  timeZone: ""
+  kubectlImage: registry.k8s.io/kubectl:v1.33.13
+  activeDeadlineSeconds: 180
+  resources:
+    requests:
+      cpu: 20m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+sample:
+  schedule: "*/5 * * * *"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi

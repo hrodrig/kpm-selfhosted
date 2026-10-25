@@ -1,0 +1,26 @@
+kpm {{ .Values.sampler }} is installed in {{ .Release.Namespace }}.
+Image: {{ include "kpm.image" . }}
+Store claim: {{ include "kpm.claimName" . }}
+
+{{- if eq (include "kpm.httpEnabled" .) "true" }}
+
+Charts and JSON: Service {{ include "kpm.fullname" . }} port {{ .Values.service.port }}.
+The page is at / and /ui. MCP is {{ if .Values.mcp.enabled }}on{{ else }}off{{ end }}.
+
+The chart did not create a Secret. It reads {{ .Values.server.tokenEnv }} from Secret {{ .Values.secrets.existingSecret | quote }} (envFrom).
+Create that Secret before install if it is not there yet:
+
+  kubectl -n {{ .Release.Namespace }} create secret generic {{ .Values.secrets.existingSecret }} \
+    --from-literal={{ .Values.server.tokenEnv }}="$(openssl rand -hex 32)"
+
+Do not commit the token. Liveness is /livez. Readiness is /readyz.
+{{- end }}
+
+{{- if and (eq .Values.sampler "daemon") .Values.recommend.enabled }}
+
+Recommend CronJob {{ include "kpm.fullname" . }}-recommend execs into the daemon pod.
+It does not mount the volume. Exit 3 until min_samples is met.
+{{- end }}
+
+One writer. Do not also apply run/kubernetes/manifests/cronjob.yaml or deployment.yaml
+against this claim.

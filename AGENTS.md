@@ -14,9 +14,9 @@ Context and instructions for AI coding agents working on **kpm-selfhosted** (ope
 |--------------------|-----------------------------------------------------|
 | Operator README, **`run/`** | Go CLI, sample→SQLite, **`make release-check`**, packages |
 | Example YAML under **`run/examples/`** | Canonical sample: **`configs/kpm.sample.yml`** |
-| In-cluster CronJob / Deployment + PVC + RBAC | Metrics sampling, recommend, capacity, TUI, optional notify/MCP/server |
+| In-cluster CronJob / Deployment + PVC + RBAC, Helm chart | Metrics sampling, recommend, capacity, TUI, optional notify/MCP/server |
 
-**Not here (yet):** Docker Compose, Helm chart. Prefer flat manifests under **`run/kubernetes/manifests/`**.
+**Not here:** Docker Compose. Flat manifests stay under **`run/kubernetes/manifests/`**. Helm chart: **`run/kubernetes/helm/kpm/`**.
 
 **Do not** invent YAML keys in examples that the application does not support — when upstream schema changes, update **`run/examples/*.yml`** and README snippets together.
 
@@ -25,20 +25,23 @@ Context and instructions for AI coding agents working on **kpm-selfhosted** (ope
 | Name | Meaning |
 |------|---------|
 | Root **`VERSION`** + README badge + Git tag **`v*`** | Snapshot of **this** repo (docs/examples) |
-| **`ghcr.io/hrodrig/kpm:vX.Y.Z`** in docs/manifests | **kpm** application image — pin published [kpm releases](https://github.com/hrodrig/kpm/releases) only |
+| **`Chart.yaml` `version:`** | Helm package semver. Bump only when `run/kubernetes/helm/kpm/` changes. May lag repo `VERSION`. |
+| **`Chart.yaml` `appVersion`** and **`ghcr.io/hrodrig/kpm:vX.Y.Z`** | **kpm** application image — pin published [kpm releases](https://github.com/hrodrig/kpm/releases) only. Empty `image.tag` uses `appVersion`. |
 
 Do **not** bump this repo’s `VERSION` only to mirror an app tag.
 
 ## Checks and make targets
 
 - **`make release-check`** — VERSION semver, README **Version** badge, CHANGELOG section for current VERSION. Script: **`testing/scripts/release-check.sh`**.
+- **`make helm-lint`** — `helm lint` and `helm template` for the daemon and the one-shot CronJob shapes. CI: **`.github/workflows/helm-lint.yml`**.
+- **Chart publish:** **`.github/workflows/release-charts.yml`** on a `v*` tag (and `workflow_dispatch`). chart-releaser writes GitHub Release `kpm-<chartVersion>` and the `gh-pages` index. It does not replace **`release.yml`** (docs Release for the git tag). Do not hand-edit `gh-pages`. A tag whose diff does not touch `run/kubernetes/helm/` succeeds with “No chart changes detected”.
 
 **Application gate:** clone **kpm** and run **`make release-check`** there before tagging an upstream app release.
 
 ## Git flow
 
 - **Branches:** Work on **`develop`**. Topic branch → **PR into `develop`**. Release snapshot: **PR `develop` → `main`**, then annotated tag **`v<semver>`** on **`main`**.
-- **Never** merge to **`main`**, create/push a release tag, or trigger [**.github/workflows/release.yml**](.github/workflows/release.yml) **without explicit user approval**.
+- **Never** merge to **`main`**, create/push a release tag, or trigger [**.github/workflows/release.yml**](.github/workflows/release.yml) or [**.github/workflows/release-charts.yml**](.github/workflows/release-charts.yml) **without explicit user approval**.
 - **Commits:** Show the proposed commit message and wait for user approval before `git commit`.
 - **Language:** English only for code, comments, commit messages, docs, and README.
 
@@ -49,15 +52,17 @@ Do **not** bump this repo’s `VERSION` only to mirror an app tag.
 | 1 | **`VERSION`** | New semver without `v` |
 | 2 | **`README.md`** | Static **Version** badge `version-<semver>` |
 | 3 | **`CHANGELOG.md`** | Move `[Unreleased]` into `## [X.Y.Z] - YYYY-MM-DD` |
-| 4 | **Upstream pins** | When documenting a new **kpm** app release: update **`ghcr.io/hrodrig/kpm:v…`** in **`run/`** |
-| 5 | **Gate** | `make release-check` |
-| 6 | **Ship** | Merge `develop` → `main`, annotated tag — **only after user approves** |
+| 4 | **Upstream pins** | When documenting a new **kpm** app release: update **`ghcr.io/hrodrig/kpm:v…`** in **`run/`** and **`Chart.yaml` `appVersion`** |
+| 5 | **Helm package** | Bump **`Chart.yaml` `version:`** only when `run/kubernetes/helm/kpm/` changed |
+| 6 | **Gate** | `make release-check` and `make helm-lint` |
+| 7 | **Ship** | Merge `develop` → `main`, annotated tag — **only after user approves** |
 
 ## Repository structure
 
 - **`run/docker/`** — `docker run` notes (distroless image; mount kubeconfig + config + store volume).
 - **`run/examples/`** — operator YAML samples; must match upstream SPEC.
 - **`run/kubernetes/manifests/`** — CronJob (one-shot sample), Deployment (daemon), PVC, Service, RBAC.
+- **`run/kubernetes/helm/kpm/`** — Helm chart for the same shapes. `sampler: daemon` (default) or `cronjob`. MCP off unless `mcp.enabled`.
 - **`run/standalone/`** — binary + cron/systemd notes (linux, macos, bsd).
 - **`testing/scripts/`** — `release-check.sh`, `extract-changelog.sh`.
 

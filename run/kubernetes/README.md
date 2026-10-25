@@ -1,8 +1,17 @@
 # Kubernetes — kpm
 
-Flat manifests under **[manifests/](manifests/)**. No Helm chart in v0.1.0.
+Flat manifests under **[manifests/](manifests/)**. Helm chart: **[helm/kpm](helm/kpm)** (`sampler: daemon` by default, MCP off). Install from the published repo, not from a checkout path:
 
-**Image pin:** `ghcr.io/hrodrig/kpm:v1.0.0`
+```bash
+helm repo add kpm https://hrodrig.github.io/kpm-selfhosted/
+helm repo update
+helm install kpm kpm/kpm --namespace kpm --create-namespace \
+  --set secrets.existingSecret=kpm-secrets
+```
+
+The chart does not create the bearer Secret. Name it with `secrets.existingSecret`. Examples: [helm/kpm/README.md](helm/kpm/README.md).
+
+**Image pin:** `ghcr.io/hrodrig/kpm:v1.1.0`
 
 Requires **metrics-server** (or equivalent Metrics API) in the cluster.
 
