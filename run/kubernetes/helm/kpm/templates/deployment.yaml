@@ -17,6 +17,10 @@ spec:
         {{- include "kpm.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "kpm.fullname" . }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: kpm
           image: {{ include "kpm.image" . | quote }}

@@ -18,6 +18,10 @@ serviceAccount:
   create: true
   annotations: {}
 
+# Scheduling for the sampler pod and the recommend Job. Empty omits the field.
+# nodeAffinity / podAffinity / podAntiAffinity live under this object.
+affinity: {}
+
 rbac:
   create: true
 
