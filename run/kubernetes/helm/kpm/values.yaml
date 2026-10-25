@@ -73,6 +73,12 @@ server:
   listen: "0.0.0.0:9740"
   tokenEnv: KPM_SERVER_TOKEN
 
+# Liveness is /livez. kpm v1.0.0 only serves /healthz; set livenessPath to
+# /healthz until that release exists. Readiness is already /readyz.
+probes:
+  livenessPath: /livez
+  readinessPath: /readyz
+
 # Off unless the operator turns it on. Same listen as server when both are on.
 mcp:
   enabled: false

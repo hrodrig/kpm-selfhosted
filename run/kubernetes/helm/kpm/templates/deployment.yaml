@@ -50,13 +50,13 @@ spec:
           {{- if eq (include "kpm.httpEnabled" .) "true" }}
           livenessProbe:
             httpGet:
-              path: /healthz
+              path: {{ .Values.probes.livenessPath }}
               port: http
             initialDelaySeconds: 15
             periodSeconds: 30
           readinessProbe:
             httpGet:
-              path: /readyz
+              path: {{ .Values.probes.readinessPath }}
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10

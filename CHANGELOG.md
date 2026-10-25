@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Helm chart `run/kubernetes/helm/kpm` (package `0.1.0`, `appVersion` `v1.0.0`). Daemon is the default. MCP stays off. The recommend CronJob execs into the daemon pod and does not mount the PVC. `affinity` schedules the sampler pod and the recommend Job. Daemon container resources are the top-level `resources` object. Pods run as distroless nonroot (65532) with a read-only root filesystem, dropped capabilities, and RuntimeDefault seccomp. `imagePullSecrets` is optional.
+- Helm chart `run/kubernetes/helm/kpm` (package `0.1.0`, `appVersion` `v1.0.0`). Daemon is the default. MCP stays off. The recommend CronJob execs into the daemon pod and does not mount the PVC. `affinity` schedules the sampler pod and the recommend Job. Daemon container resources are the top-level `resources` object. Pods run as distroless nonroot (65532) with a read-only root filesystem, dropped capabilities, and RuntimeDefault seccomp. `imagePullSecrets` is optional. Liveness probe is `/livez` (readiness stays `/readyz`). kpm v1.0.0 still serves `/healthz`; set `probes.livenessPath` until [kpm#141](https://github.com/hrodrig/kpm/issues/141) ships.
 - Daemon profile enables the charts UI and `GET /api/v1` (`server.enabled`, bearer `KPM_SERVER_TOKEN`). MCP stays commented out.
 - CronJob `kpm-recommend` runs `kpm recommend --record` with `kubectl exec` into the daemon pod. The Job does not mount the RWO store. ServiceAccount `kpm-recommend` is namespace-local (`pods` get/list, `pods/exec`, `deployments` get).
 - README hero: `assets/kpm-selfhosted-hero.jpg` (same family artwork as upstream `kpm` OSS hero).
