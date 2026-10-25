@@ -33,6 +33,7 @@ Do **not** bump this repo’s `VERSION` only to mirror an app tag.
 ## Checks and make targets
 
 - **`make release-check`** — VERSION semver, README **Version** badge, CHANGELOG section for current VERSION. Script: **`testing/scripts/release-check.sh`**.
+- **`make helm-lint`** — `helm lint` and `helm template` for the daemon and the one-shot CronJob shapes. CI: **`.github/workflows/helm-lint.yml`**.
 
 **Application gate:** clone **kpm** and run **`make release-check`** there before tagging an upstream app release.
 
@@ -50,9 +51,10 @@ Do **not** bump this repo’s `VERSION` only to mirror an app tag.
 | 1 | **`VERSION`** | New semver without `v` |
 | 2 | **`README.md`** | Static **Version** badge `version-<semver>` |
 | 3 | **`CHANGELOG.md`** | Move `[Unreleased]` into `## [X.Y.Z] - YYYY-MM-DD` |
-| 4 | **Upstream pins** | When documenting a new **kpm** app release: update **`ghcr.io/hrodrig/kpm:v…`** in **`run/`** |
-| 5 | **Gate** | `make release-check` |
-| 6 | **Ship** | Merge `develop` → `main`, annotated tag — **only after user approves** |
+| 4 | **Upstream pins** | When documenting a new **kpm** app release: update **`ghcr.io/hrodrig/kpm:v…`** in **`run/`** and **`Chart.yaml` `appVersion`** |
+| 5 | **Helm package** | Bump **`Chart.yaml` `version:`** only when `run/kubernetes/helm/kpm/` changed |
+| 6 | **Gate** | `make release-check` and `make helm-lint` |
+| 7 | **Ship** | Merge `develop` → `main`, annotated tag — **only after user approves** |
 
 ## Repository structure
 

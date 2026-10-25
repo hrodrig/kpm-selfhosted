@@ -7,7 +7,7 @@
 
 ## Checks
 
-- **This repo:** **`make release-check`** (VERSION, README badge, CHANGELOG section) — same gate as [CI](.github/workflows/ci.yml).
+- **This repo:** **`make release-check`** (VERSION, README badge, CHANGELOG section) and **`make helm-lint`**. CI: [release-check](.github/workflows/ci.yml) and [helm-lint](.github/workflows/helm-lint.yml).
 - **kpm application:** clone **[hrodrig/kpm](https://github.com/hrodrig/kpm)** and run **`make release-check`** there.
 
 ## Releases

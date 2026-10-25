@@ -56,8 +56,8 @@ Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/k
 |-----------|---------|
 | **Binary only** (no Docker) | [Standalone binary](#standalone-binary) — Linux: [cron / systemd](run/standalone/linux/README.md) |
 | **Single container** (`docker run`) | [Docker single container](#docker-single-container) |
-| **Kubernetes, scheduled sample** | [Kubernetes manifests](#kubernetes-manifests) — [cronjob.yaml](run/kubernetes/manifests/cronjob.yaml) |
-| **Kubernetes, daemon** (`interval_seconds > 0` + `/healthz`) | [Kubernetes manifests](#kubernetes-manifests) — [deployment.yaml](run/kubernetes/manifests/deployment.yaml) |
+| **Kubernetes, scheduled sample** | [Kubernetes manifests](#kubernetes-manifests) — [cronjob.yaml](run/kubernetes/manifests/cronjob.yaml) or Helm `sampler=cronjob` |
+| **Kubernetes, daemon** | Flat [deployment.yaml](run/kubernetes/manifests/deployment.yaml) (probe `/healthz` on image `v1.0.0`) or the [Helm chart](#helm) |
 | **Starter YAML** | [Example profiles](#example-profiles) |
 
 Deeper index: **[`run/README.md`](run/README.md)**.
@@ -230,7 +230,8 @@ Schema: upstream [SPECIFICATIONS.md](https://github.com/hrodrig/kpm/blob/main/SP
 Notification sinks and bearer tokens are **fail-closed** via env vars (e.g. **`KPM_SLACK_WEBHOOK`**, **`KPM_SERVER_TOKEN`**, and **`KPM_MCP_TOKEN`** only when MCP is enabled) — never put secrets in committed YAML.
 
 - Docker / standalone: export the env var (or `EnvironmentFile=` in systemd).
-- Kubernetes: copy [secret.example.yaml](run/kubernetes/manifests/secret.example.yaml), apply as Secret `kpm-secrets`, leave sinks out of the profile if unused.
+- Kubernetes manifests: copy [secret.example.yaml](run/kubernetes/manifests/secret.example.yaml), apply as Secret `kpm-secrets`, leave sinks out of the profile if unused.
+- Helm: the chart does not create that Secret. Pass its name as `secrets.existingSecret`. See [chart README](run/kubernetes/helm/kpm/README.md).
 
 **[↑ Contents](#table-of-contents)**
 
@@ -243,12 +244,13 @@ run/
 ├── docker/                      # docker run notes
 ├── examples/                    # kpm-minimal.yml, kpm-daemon.yml
 ├── kubernetes/
-│   └── manifests/             # namespace, RBAC, PVC, ConfigMap, sample CronJob, recommend CronJob, Deployment, Secret example
+│   ├── manifests/             # namespace, RBAC, PVC, ConfigMap, sample CronJob, recommend CronJob, Deployment, Secret example
+│   └── helm/kpm/              # Helm chart (daemon default, MCP off)
 └── standalone/{linux,macos,bsd}/
 testing/
 └── scripts/                     # release-check.sh, extract-changelog.sh
 assets/                          # README hero + product captures (TUI / serve / flow)
-Makefile                         # release-check
+Makefile                         # release-check, helm-lint
 ```
 
 Maintainers: **`make release-check`** before tagging — see **[CONTRIBUTING.md](CONTRIBUTING.md)**.
