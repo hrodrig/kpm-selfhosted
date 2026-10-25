@@ -58,6 +58,7 @@ Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/k
 | **Single container** (`docker run`) | [Docker single container](#docker-single-container) |
 | **Kubernetes, scheduled sample** | [Kubernetes manifests](#kubernetes-manifests) — [cronjob.yaml](run/kubernetes/manifests/cronjob.yaml) or Helm `sampler=cronjob` |
 | **Kubernetes, daemon** | Flat [deployment.yaml](run/kubernetes/manifests/deployment.yaml) or the [Helm chart](#helm). Liveness is `/livez`. |
+| **Kubernetes, no egress** | [private-registry.md](run/kubernetes/private-registry.md) — mirror the chart and images, then install from your registry |
 | **Starter YAML** | [Example profiles](#example-profiles) |
 
 Deeper index: **[`run/README.md`](run/README.md)**.
