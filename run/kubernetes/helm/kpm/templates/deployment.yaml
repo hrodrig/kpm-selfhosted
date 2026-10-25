@@ -17,6 +17,8 @@ spec:
         {{- include "kpm.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "kpm.fullname" . }}
+      {{- include "kpm.imagePullSecrets" . | nindent 6 }}
+      {{- include "kpm.podSecurityContext" . | nindent 6 }}
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
@@ -25,6 +27,7 @@ spec:
         - name: kpm
           image: {{ include "kpm.image" . | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- include "kpm.containerSecurityContext" . | nindent 10 }}
           args: ["sample", "--config", "/config/kpm-daemon.yml"]
           {{- if eq (include "kpm.httpEnabled" .) "true" }}
           ports:
@@ -42,6 +45,8 @@ spec:
               readOnly: true
             - name: store
               mountPath: /data
+            - name: tmp
+              mountPath: /tmp
           {{- if eq (include "kpm.httpEnabled" .) "true" }}
           livenessProbe:
             httpGet:
@@ -57,7 +62,7 @@ spec:
             periodSeconds: 10
           {{- end }}
           resources:
-            {{- toYaml .Values.resources.daemon | nindent 12 }}
+            {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         - name: config
           configMap:
@@ -65,4 +70,6 @@ spec:
         - name: store
           persistentVolumeClaim:
             claimName: {{ include "kpm.claimName" . }}
+        - name: tmp
+          emptyDir: {}
 {{- end }}

@@ -65,6 +65,23 @@ true
 {{- end }}
 {{- end }}
 
+{{- define "kpm.imagePullSecrets" -}}
+{{- with .Values.imagePullSecrets }}
+imagePullSecrets:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end }}
+
+{{- define "kpm.podSecurityContext" -}}
+securityContext:
+  {{- toYaml .Values.podSecurityContext | nindent 2 }}
+{{- end }}
+
+{{- define "kpm.containerSecurityContext" -}}
+securityContext:
+  {{- toYaml .Values.securityContext | nindent 2 }}
+{{- end }}
+
 {{- define "kpm.clientId" -}}
 {{- if .Values.config.clientId }}
 {{- .Values.config.clientId }}

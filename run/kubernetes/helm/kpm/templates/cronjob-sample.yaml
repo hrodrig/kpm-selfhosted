@@ -20,6 +20,8 @@ spec:
             {{- include "kpm.selectorLabels" . | nindent 12 }}
         spec:
           serviceAccountName: {{ include "kpm.fullname" . }}
+          {{- include "kpm.imagePullSecrets" . | nindent 10 }}
+          {{- include "kpm.podSecurityContext" . | nindent 10 }}
           {{- with .Values.affinity }}
           affinity:
             {{- toYaml . | nindent 12 }}
@@ -29,6 +31,7 @@ spec:
             - name: kpm
               image: {{ include "kpm.image" . | quote }}
               imagePullPolicy: {{ .Values.image.pullPolicy }}
+              {{- include "kpm.containerSecurityContext" . | nindent 14 }}
               args: ["sample", "--config", "/config/kpm.yml"]
               {{- if .Values.secrets.existingSecret }}
               envFrom:
@@ -42,8 +45,10 @@ spec:
                   readOnly: true
                 - name: store
                   mountPath: /data
+                - name: tmp
+                  mountPath: /tmp
               resources:
-                {{- toYaml .Values.resources.sample | nindent 16 }}
+                {{- toYaml .Values.sample.resources | nindent 16 }}
           volumes:
             - name: config
               configMap:
@@ -51,4 +56,6 @@ spec:
             - name: store
               persistentVolumeClaim:
                 claimName: {{ include "kpm.claimName" . }}
+            - name: tmp
+              emptyDir: {}
 {{- end }}

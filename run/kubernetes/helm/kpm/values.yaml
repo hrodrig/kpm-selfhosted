@@ -7,6 +7,28 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
+# Optional. Empty omits imagePullSecrets.
+# - name: ghcr-pull
+imagePullSecrets: []
+
+# Matches gcr.io/distroless/static-debian13:nonroot (uid/gid 65532).
+# fsGroup lets that user create the SQLite file on the PVC.
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  fsGroupChangePolicy: OnRootMismatch
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
 # daemon: Deployment owns the PVC and serves charts + /api/v1.
 # cronjob: one-shot sample CronJob owns the PVC. No Deployment, no recommend Job.
 sampler: daemon
@@ -65,6 +87,15 @@ service:
   type: ClusterIP
   port: 9740
 
+# Container resources for the daemon. Sample and recommend Jobs have their own.
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
 # Only with sampler daemon. Exec into the daemon pod; does not mount the PVC.
 recommend:
   enabled: true
@@ -73,29 +104,20 @@ recommend:
   timeZone: ""
   kubectlImage: registry.k8s.io/kubectl:v1.33.13
   activeDeadlineSeconds: 180
-
-sample:
-  schedule: "*/5 * * * *"
-
-resources:
-  daemon:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
-  sample:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 500m
-      memory: 256Mi
-  recommend:
+  resources:
     requests:
       cpu: 20m
       memory: 64Mi
     limits:
       cpu: 200m
       memory: 128Mi
+
+sample:
+  schedule: "*/5 * * * *"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi

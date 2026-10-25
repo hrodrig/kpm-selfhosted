@@ -24,6 +24,8 @@ spec:
             {{- include "kpm.selectorLabels" . | nindent 12 }}
         spec:
           serviceAccountName: {{ include "kpm.fullname" . }}-recommend
+          {{- include "kpm.imagePullSecrets" . | nindent 10 }}
+          {{- include "kpm.podSecurityContext" . | nindent 10 }}
           {{- with .Values.affinity }}
           affinity:
             {{- toYaml . | nindent 12 }}
@@ -32,6 +34,10 @@ spec:
           containers:
             - name: recommend
               image: {{ .Values.recommend.kubectlImage | quote }}
+              {{- include "kpm.containerSecurityContext" . | nindent 14 }}
+              env:
+                - name: HOME
+                  value: /tmp
               command: ["/bin/kubectl"]
               args:
                 - exec
@@ -46,6 +52,12 @@ spec:
                 - --record
                 - --config
                 - /config/kpm-daemon.yml
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
               resources:
-                {{- toYaml .Values.resources.recommend | nindent 16 }}
+                {{- toYaml .Values.recommend.resources | nindent 16 }}
+          volumes:
+            - name: tmp
+              emptyDir: {}
 {{- end }}
