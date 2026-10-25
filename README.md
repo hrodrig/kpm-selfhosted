@@ -75,7 +75,7 @@ Deeper index: **[`run/README.md`](run/README.md)**.
 | Example profiles under **`run/examples/`** | Canonical sample: **`configs/kpm.sample.yml`** |
 | Docs CI (`make release-check`) | govulncheck, grype, GoReleaser, Cosign, SBOM |
 
-**Not shipped here (yet):** Docker Compose, Helm chart, kind e2e. Prefer flat manifests under **`run/kubernetes/manifests/`**.
+**Not shipped here:** Docker Compose, kind e2e. Flat manifests: **`run/kubernetes/manifests/`**. Helm chart: **`run/kubernetes/helm/kpm/`**.
 
 **[↑ Contents](#table-of-contents)**
 
@@ -158,7 +158,7 @@ docker stop kpm && docker rm kpm
 
 ## Kubernetes manifests
 
-**Goal:** run **kpm** in-cluster with a **ServiceAccount**, **read-only** RBAC, and a **PVC** for the SQLite store (no Helm chart in v0.1.x).
+**Goal:** run **kpm** in-cluster with a **ServiceAccount**, **read-only** RBAC, and a **PVC** for the SQLite store. Flat manifests or the Helm chart.
 
 **Image pin in manifests:** `ghcr.io/hrodrig/kpm:v1.0.0`
 
@@ -184,7 +184,9 @@ Edit `scope:` / `cluster:` in the ConfigMap for your workloads. Full walkthrough
 
 ### Helm
 
-Chart: [run/kubernetes/helm/kpm](run/kubernetes/helm/kpm). Package `version` is the chart. `appVersion` is the kpm image (`v1.0.0` when `image.tag` is empty). Repo `VERSION` stays the docs snapshot.
+Chart: [run/kubernetes/helm/kpm](run/kubernetes/helm/kpm). Package `version` is the chart. `appVersion` is the kpm image (`v1.0.0` when `image.tag` is empty). Repo `VERSION` stays the docs snapshot. Secret contract and examples: [chart README](run/kubernetes/helm/kpm/README.md).
+
+`secrets.existingSecret` is the name of a Secret you create. The chart does not create it and does not accept the token in values. With the daemon and `server.enabled`, install fails if the name is empty. The Deployment loads every key via `envFrom`. `KPM_SERVER_TOKEN` is the charts bearer.
 
 ```bash
 kubectl -n kpm create secret generic kpm-secrets \
@@ -193,6 +195,15 @@ kubectl -n kpm create secret generic kpm-secrets \
 helm install kpm run/kubernetes/helm/kpm \
   --namespace kpm --create-namespace \
   --set secrets.existingSecret=kpm-secrets
+```
+
+Against image `v1.0.0`, liveness is still `/healthz`:
+
+```bash
+helm install kpm run/kubernetes/helm/kpm \
+  --namespace kpm --create-namespace \
+  --set secrets.existingSecret=kpm-secrets \
+  --set probes.livenessPath=/healthz
 ```
 
 Default `sampler` is `daemon` (one replica, RWO PVC, charts on `:9740`, MCP off). `sampler=cronjob` is the one-shot sample Job and does not render the Deployment. The recommend CronJob execs into the daemon and does not mount the disk. Do not install the chart and the flat manifests against the same claim.

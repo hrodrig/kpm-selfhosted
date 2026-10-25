@@ -5,8 +5,16 @@ Store claim: {{ include "kpm.claimName" . }}
 {{- if eq (include "kpm.httpEnabled" .) "true" }}
 
 Charts and JSON: Service {{ include "kpm.fullname" . }} port {{ .Values.service.port }}.
-The page is at / and /ui. Bearer env {{ .Values.server.tokenEnv }} lives in Secret {{ .Values.secrets.existingSecret }}.
-MCP is {{ if .Values.mcp.enabled }}on{{ else }}off{{ end }}.
+The page is at / and /ui. MCP is {{ if .Values.mcp.enabled }}on{{ else }}off{{ end }}.
+
+The chart did not create a Secret. It reads {{ .Values.server.tokenEnv }} from Secret {{ .Values.secrets.existingSecret | quote }} (envFrom).
+Create that Secret before install if it is not there yet:
+
+  kubectl -n {{ .Release.Namespace }} create secret generic {{ .Values.secrets.existingSecret }} \
+    --from-literal={{ .Values.server.tokenEnv }}="$(openssl rand -hex 32)"
+
+Do not commit the token. kpm v1.0.0 liveness is still /healthz:
+  --set probes.livenessPath=/healthz
 {{- end }}
 
 {{- if and (eq .Values.sampler "daemon") .Values.recommend.enabled }}

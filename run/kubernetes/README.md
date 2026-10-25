@@ -1,6 +1,6 @@
 # Kubernetes — kpm
 
-Flat manifests under **[manifests/](manifests/)**. Helm chart: **[helm/kpm](helm/kpm)** (`sampler: daemon` by default, MCP off).
+Flat manifests under **[manifests/](manifests/)**. Helm chart: **[helm/kpm](helm/kpm)** (`sampler: daemon` by default, MCP off). The chart does not create the bearer Secret. Name it with `secrets.existingSecret`. Examples: [helm/kpm/README.md](helm/kpm/README.md).
 
 **Image pin:** `ghcr.io/hrodrig/kpm:v1.0.0`
 

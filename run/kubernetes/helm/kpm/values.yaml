@@ -85,7 +85,19 @@ mcp:
   listen: "0.0.0.0:9740"
   tokenEnv: KPM_MCP_TOKEN
 
-# Required when server.enabled or mcp.enabled. The chart does not create the Secret.
+# Name of a Secret that already exists in the release namespace.
+# The chart does not create it. The daemon mounts every key with envFrom.
+# Required when sampler is daemon and server.enabled or mcp.enabled is true.
+# Install fails if this is empty in that case.
+#
+#   kubectl -n kpm create secret generic kpm-secrets \
+#     --from-literal=KPM_SERVER_TOKEN="$(openssl rand -hex 32)"
+#
+#   secrets:
+#     existingSecret: kpm-secrets
+#
+# Add KPM_MCP_TOKEN to that Secret only when mcp.enabled is true.
+# Do not put the token in this file.
 secrets:
   existingSecret: ""
 
