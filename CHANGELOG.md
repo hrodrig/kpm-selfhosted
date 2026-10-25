@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Private-registry how-to [run/kubernetes/private-registry.md](run/kubernetes/private-registry.md) and `mirror-kpm-image.sh`. A host with egress copies the chart and the images; the locked cluster installs from that registry. The script pushes the upstream tag and `sha256-<hex>`. The root README Helm section links the how-to.
+
 ## [0.2.0] - 2026-10-25
 
 ### Added

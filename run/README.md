@@ -18,6 +18,7 @@ This tree holds **how to run kpm**, not the CLI source. Product docs: [kpm](http
 | kubeconfig on a laptop / bastion | [docker/README.md](docker/README.md) |
 | Kubernetes, scheduled one-shot sample | [kubernetes/manifests/cronjob.yaml](kubernetes/manifests/cronjob.yaml) |
 | Kubernetes, long-running daemon | [kubernetes/manifests/deployment.yaml](kubernetes/manifests/deployment.yaml) plus [recommend-cronjob.yaml](kubernetes/manifests/recommend-cronjob.yaml), or [Helm](kubernetes/helm/kpm/README.md) |
+| Kubernetes, no egress | [kubernetes/private-registry.md](kubernetes/private-registry.md) — mirror chart and images, then install from your registry |
 | Kubernetes, Helm | [kubernetes/helm/kpm](kubernetes/helm/kpm/README.md) (`secrets.existingSecret` required for the daemon) |
 | Linux host + cron only | [standalone/README.md](standalone/README.md) |
 | Need a starter config | [examples/](examples/README.md) |
