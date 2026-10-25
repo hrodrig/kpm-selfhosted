@@ -13,6 +13,8 @@ The chart does not create the bearer Secret. Name it with `secrets.existingSecre
 
 **Image pin:** `ghcr.io/hrodrig/kpm:v1.1.0`
 
+No egress from the cluster or the bastion: mirror the chart and the images first. [private-registry.md](private-registry.md).
+
 Requires **metrics-server** (or equivalent Metrics API) in the cluster.
 
 ## Apply order
