@@ -1,7 +1,9 @@
 # Daemon: sample → SQLite each tick. Charts and /api/v1 are on.
 # MCP is off. Uncomment the mcp block to enable it, and set KPM_MCP_TOKEN.
 # Prefer loopback listen on bastions; use 0.0.0.0 only behind a Service / proxy
-# with token_env set. Slack: set KPM_SLACK_WEBHOOK when sinks are enabled.
+# with token_env set. Loopback alone does not disable MPTCP — see ../SECURITY.md
+# (CVE-2026-98432: patch the host/node kernel; kpm v1.2.0+ mitigates in-process).
+# Slack: set KPM_SLACK_WEBHOOK when sinks are enabled.
 # Charts / JSON API bearer: set KPM_SERVER_TOKEN (required when listen is not loopback).
 
 cluster:

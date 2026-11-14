@@ -6,6 +6,7 @@ This tree holds **how to run kpm**, not the CLI source. Product docs: [kpm](http
 
 | Directory | Purpose |
 |-----------|---------|
+| [SECURITY.md](SECURITY.md) | Host notes: CVE-2026-98432 / MPTCP (kernel patch primary) |
 | [docker/](docker/README.md) | Run the published image on a bastion with kubeconfig + config + store mount |
 | [kubernetes/](kubernetes/README.md) | Flat manifests or Helm chart `kubernetes/helm/kpm` |
 | [standalone/](standalone/README.md) | **cron** and **systemd** using the Releases binary |
