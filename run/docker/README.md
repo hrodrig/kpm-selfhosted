@@ -35,12 +35,13 @@ docker run -d --name kpm \
   -e KUBECONFIG=/kube/config \
   -e KPM_SLACK_WEBHOOK \
   -e KPM_SERVER_TOKEN \
+  -e GODEBUG=multipathtcp=0 \
   -p 127.0.0.1:9740:9740 \
   ghcr.io/hrodrig/kpm:v1.2.0 \
   sample --config /config/kpm.yml
 ```
 
-Prefer binding HTTP to loopback in the profile (`127.0.0.1:9740`); map host ports carefully. Off-loopback binds require a bearer token (`token_env`).
+Prefer binding HTTP to loopback in the profile (`127.0.0.1:9740`); map host ports carefully. Off-loopback binds require a bearer token (`token_env`). `GODEBUG=multipathtcp=0` is optional belt-and-suspenders on Linux (omit on non-Linux Docker Desktop if unused); **patch the host kernel** for CVE-2026-98432 — see [SECURITY.md](../SECURITY.md). Image **v1.2.0+** already disables MPTCP in-process. Restart the container after changing `GODEBUG`.
 
 **Stop:** `docker stop kpm && docker rm kpm`
 
@@ -48,4 +49,5 @@ Prefer binding HTTP to loopback in the profile (`127.0.0.1:9740`); map host port
 
 - In-cluster: prefer [kubernetes/manifests/](../kubernetes/manifests/) (ServiceAccount + RBAC + PVC) instead of mounting a user kubeconfig.
 - Schema and flags: upstream [SPECIFICATIONS.md](https://github.com/hrodrig/kpm/blob/main/SPECIFICATIONS.md).
+- No Compose in this repo.
 - Metrics Server must be available in the target cluster for pod metrics.

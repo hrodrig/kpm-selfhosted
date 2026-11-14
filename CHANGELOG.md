@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- [run/SECURITY.md](run/SECURITY.md): operator notes for **CVE-2026-98432** /
+  MPTCP — patch the Linux kernel first; optional `GODEBUG=multipathtcp=0` for
+  systemd / Docker / Secret `envFrom`; prefer loopback on bastions (does not
+  disable MPTCP). Linked from README, standalone Linux, Docker, Kubernetes,
+  Helm chart README, and `secret.example.yaml` ([#14](https://github.com/hrodrig/kpm-selfhosted/issues/14)).
+
 ## [0.2.1] - 2026-11-14
 
 ### Added
