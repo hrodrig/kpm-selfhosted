@@ -37,6 +37,7 @@ Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/k
 - [Pick a path](#pick-a-path)
 - [What is in this repo (and what is not)](#what-is-in-this-repo-and-what-is-not)
 - [Standalone binary](#standalone-binary)
+- [Take the store home](#take-the-store-home)
 - [Docker single container](#docker-single-container)
 - [Kubernetes manifests](#kubernetes-manifests)
 - [Example profiles](#example-profiles)
@@ -100,6 +101,29 @@ kpm recommend --config /tmp/kpm.yml
 ```
 
 **macOS / BSD:** [run/standalone/macos](run/standalone/macos/README.md) · [run/standalone/bsd](run/standalone/bsd/README.md)
+
+**[↑ Contents](#table-of-contents)**
+
+---
+
+## Take the store home
+
+**Goal:** copy SQLite history from the bastion / PVC host to a laptop for
+**`kpm serve`** / **`kpm mcp`** (analyze-local). Do **not** `cp`/`scp` the live
+`store.path` while the sampler writes — WAL hot copies often fail
+`PRAGMA integrity_check`.
+
+On the machine that owns the store:
+
+```bash
+kpm backup --config /etc/kpm/kpm.yaml -o /tmp/metrics-home.db
+# take metrics-home.db home; on the laptop: integrity_check, then serve/mcp
+```
+
+**Not the same:** `kpm recommend --record` writes rightsizing rows (works offline
+on the copy). `kpm capacity --record-nodes` needs the live cluster for node
+snapshots. Details: upstream
+**[take-home-store.md](https://github.com/hrodrig/kpm/blob/develop/docs/take-home-store.md)**.
 
 **[↑ Contents](#table-of-contents)**
 
