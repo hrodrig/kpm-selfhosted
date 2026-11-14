@@ -1,6 +1,6 @@
 # kpm-selfhosted
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue)](https://github.com/hrodrig/kpm-selfhosted/releases)
+[![Version](https://img.shields.io/badge/version-0.2.1-blue)](https://github.com/hrodrig/kpm-selfhosted/releases)
 [![Release](https://img.shields.io/github/v/release/hrodrig/kpm-selfhosted?label=release)](https://github.com/hrodrig/kpm-selfhosted/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![App image on GHCR](https://img.shields.io/badge/image-ghcr.io%2Fhrodrig%2Fkpm-2496ED?logo=github)](https://github.com/hrodrig/kpm/pkgs/container/kpm)
@@ -14,7 +14,7 @@ Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/k
 
 > **Operator snapshot.** The Version badge is this repo. The image pin below is a published [kpm](https://github.com/hrodrig/kpm) release. Manifests are examples. Software is provided **“AS IS”** — see the [MIT License](./LICENSE).
 
-**Default app image pin:** [`ghcr.io/hrodrig/kpm:v1.1.0`](https://github.com/hrodrig/kpm/releases/tag/v1.1.0).
+**Default app image pin:** [`ghcr.io/hrodrig/kpm:v1.2.0`](https://github.com/hrodrig/kpm/releases/tag/v1.2.0).
 
 **Walkthrough (DEV.to):** [kpm — Kubernetes rightsizing without Prometheus, history on your laptop](https://dev.to/hrodrig/kpm-kubernetes-rightsizing-without-prometheus-history-on-your-laptop-4272) · product screens in the [kpm README](https://github.com/hrodrig/kpm#whats-new-in-06--analyze-local-charts).
 
@@ -133,7 +133,7 @@ snapshots. Details: upstream
 
 **Goal:** one container, no Compose file. Image is **distroless** (no shell).
 
-**Image:** `ghcr.io/hrodrig/kpm:v1.1.0`
+**Image:** `ghcr.io/hrodrig/kpm:v1.2.0`
 
 ### One-shot (single sample)
 
@@ -144,7 +144,7 @@ docker run --rm \
   -v "$HOME/.local/share/kpm:/data" \
   -e KUBECONFIG=/kube/config \
   -e KPM_SLACK_WEBHOOK \
-  ghcr.io/hrodrig/kpm:v1.1.0 \
+  ghcr.io/hrodrig/kpm:v1.2.0 \
   sample --config /config/kpm.yml
 ```
 
@@ -163,7 +163,7 @@ docker run -d --name kpm \
   -e KPM_SLACK_WEBHOOK \
   -e KPM_SERVER_TOKEN \
   -p 127.0.0.1:9740:9740 \
-  ghcr.io/hrodrig/kpm:v1.1.0 \
+  ghcr.io/hrodrig/kpm:v1.2.0 \
   sample --config /config/kpm.yml
 ```
 
@@ -185,7 +185,7 @@ docker stop kpm && docker rm kpm
 
 **Goal:** run **kpm** in-cluster with a **ServiceAccount**, **read-only** RBAC, and a **PVC** for the SQLite store. Flat manifests or the Helm chart.
 
-**Image pin in manifests:** `ghcr.io/hrodrig/kpm:v1.1.0`
+**Image pin in manifests:** `ghcr.io/hrodrig/kpm:v1.2.0`
 
 ```bash
 kubectl apply -f run/kubernetes/manifests/namespace.yaml
@@ -209,7 +209,7 @@ Edit `scope:` / `cluster:` in the ConfigMap for your workloads. Full walkthrough
 
 ### Helm
 
-Chart: [run/kubernetes/helm/kpm](run/kubernetes/helm/kpm). Package `version` is the chart. `appVersion` is the kpm image (`v1.1.0` when `image.tag` is empty). Repo `VERSION` stays the docs snapshot. Secret contract and examples: [chart README](run/kubernetes/helm/kpm/README.md).
+Chart: [run/kubernetes/helm/kpm](run/kubernetes/helm/kpm). Package `version` is the chart. `appVersion` is the kpm image (`v1.2.0` when `image.tag` is empty). Repo `VERSION` stays the docs snapshot. Secret contract and examples: [chart README](run/kubernetes/helm/kpm/README.md).
 
 `secrets.existingSecret` is the name of a Secret you create. The chart does not create it and does not accept the token in values. With the daemon and `server.enabled`, install fails if the name is empty. The Deployment loads every key via `envFrom`. `KPM_SERVER_TOKEN` is the charts bearer.
 
