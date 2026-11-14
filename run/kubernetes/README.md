@@ -52,3 +52,5 @@ Until some workload reaches `recommend.min_samples` (24 at a 300s interval is ab
 ## Secrets
 
 Copy [manifests/secret.example.yaml](manifests/secret.example.yaml), set notification and server env vars, apply as `kpm-secrets` in namespace `kpm`. The daemon fail-closes if `KPM_SERVER_TOKEN` is missing while `server.listen` is `0.0.0.0`. Omit the Secret and notification sinks if unused. Add `KPM_MCP_TOKEN` only when `mcp.enabled` is true.
+
+Optional on Linux nodes until the **kernel** is patched for CVE-2026-98432: put `GODEBUG=multipathtcp=0` in that Secret (daemon uses `envFrom`). Restart the Deployment so pods recreate. Primary fix is still the node kernel; prefer image **v1.2.0+**. Details: [run/SECURITY.md](../SECURITY.md).

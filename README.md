@@ -42,6 +42,7 @@ Deployment manifests and operator notes for **[kpm](https://github.com/hrodrig/k
 - [Kubernetes manifests](#kubernetes-manifests)
 - [Example profiles](#example-profiles)
 - [Secrets and notifications](#secrets-and-notifications)
+- [Host security (MPTCP / CVE-2026-98432)](#host-security-mptcp--cve-2026-98432)
 - [Repository layout](#repository-layout)
 - [Versioning](#versioning)
 - [Checks](#checks)
@@ -259,10 +260,26 @@ Notification sinks and bearer tokens are **fail-closed** via env vars (e.g. **`K
 
 ---
 
+## Host security (MPTCP / CVE-2026-98432)
+
+Daemon and `kpm serve` shapes that listen on Linux create the Multipath TCP
+listen precondition behind **CVE-2026-98432** until the **host/node kernel**
+is patched. App mitigations (kpm **v1.2.0+**, optional `GODEBUG=multipathtcp=0`)
+are belt-and-suspenders and fragile if another MPTCP listener remains on the
+machine. Prefer `127.0.0.1:9740` on bastions when scrapers allow — loopback
+alone does **not** disable MPTCP.
+
+Full operator checklist (systemd, Docker, Secret/`envFrom`, restart): **[run/SECURITY.md](run/SECURITY.md)**. Upstream product notes: [kpm README — TCP listeners and MPTCP](https://github.com/hrodrig/kpm/blob/main/README.md#tcp-listeners-and-mptcp).
+
+**[↑ Contents](#table-of-contents)**
+
+---
+
 ## Repository layout
 
 ```text
 run/
+├── SECURITY.md                  # MPTCP / CVE-2026-98432 host notes
 ├── docker/                      # docker run notes
 ├── examples/                    # kpm-minimal.yml, kpm-daemon.yml
 ├── kubernetes/

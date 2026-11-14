@@ -68,6 +68,8 @@ config:
   targetUtilization: 0.70
 
 # Charts UI and GET /api/v1. Off by setting enabled false (probes and Service go with it).
+# 0.0.0.0 is correct behind ClusterIP. Patch node kernels for CVE-2026-98432.
+# Optional: put GODEBUG=multipathtcp=0 in secrets.existingSecret (envFrom). See ../../SECURITY.md.
 server:
   enabled: true
   listen: "0.0.0.0:9740"

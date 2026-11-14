@@ -31,6 +31,10 @@ User=kpm
 Group=kpm
 Environment=KUBECONFIG=/home/kpm/.kube/config
 EnvironmentFile=-/etc/kpm/kpm.env
+# Optional belt-and-suspenders until the host kernel is patched for
+# CVE-2026-98432 (or when running a kpm binary older than v1.2.0).
+# Kernel patch is the primary fix. Restart the unit after changing GODEBUG.
+# Environment=GODEBUG=multipathtcp=0
 ExecStart=/usr/local/bin/kpm sample --config /etc/kpm/kpm-daemon.yml
 Restart=on-failure
 RestartSec=10
@@ -39,6 +43,6 @@ RestartSec=10
 WantedBy=multi-user.target
 ```
 
-Put `KPM_SLACK_WEBHOOK=...` and `KPM_SERVER_TOKEN=...` in `/etc/kpm/kpm.env` (mode `0600`). Add `KPM_MCP_TOKEN` only after uncommenting `mcp.enabled`. Prefer `server.listen: 127.0.0.1:9740` on a host unless a proxy needs another bind.
+Put `KPM_SLACK_WEBHOOK=...` and `KPM_SERVER_TOKEN=...` in `/etc/kpm/kpm.env` (mode `0600`). Add `KPM_MCP_TOKEN` only after uncommenting `mcp.enabled`. Prefer `server.listen: 127.0.0.1:9740` on a host unless a proxy needs another bind (loopback alone does **not** disable MPTCP). Host/kernel notes: [run/SECURITY.md](../../SECURITY.md).
 
 Docker path: [run/docker/README.md](../../docker/README.md).

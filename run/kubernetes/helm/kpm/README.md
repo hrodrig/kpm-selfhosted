@@ -28,6 +28,11 @@ kubectl -n kpm create secret generic kpm-secrets \
 `KPM_SERVER_TOKEN` is the charts and `/api/v1` bearer. The listen is
 `0.0.0.0`, so the process refuses to start when that env var is missing.
 
+Optional on Linux nodes for CVE-2026-98432 (kernel patch is primary): add
+`GODEBUG=multipathtcp=0` to the same Secret. Restart the Deployment after
+changing it. Prefer image **v1.2.0+**. Operator notes:
+[run/SECURITY.md](../../../SECURITY.md).
+
 ```yaml
 secrets:
   existingSecret: kpm-secrets
