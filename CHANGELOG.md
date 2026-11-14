@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-14
+
 ### Added
 
 - Private-registry how-to [run/kubernetes/private-registry.md](run/kubernetes/private-registry.md) and `mirror-kpm-image.sh`. A host with egress copies the chart and the images; the locked cluster installs from that registry. The script pushes the upstream tag and `sha256-<hex>`. The root README Helm section links the how-to.
@@ -15,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   [take-home-store.md](https://github.com/hrodrig/kpm/blob/develop/docs/take-home-store.md).
   Notes `recommend --record` (offline) vs `capacity --record-nodes` (needs kube).
   Same pointer from [run/standalone/README.md](run/standalone/README.md).
+
+### Changed
+
+- Application image pin `ghcr.io/hrodrig/kpm:v1.2.0` in `run/` docs and manifests
+  (published [kpm v1.2.0](https://github.com/hrodrig/kpm/releases/tag/v1.2.0)).
+- Helm chart package `0.1.1`, `appVersion` `v1.2.0`.
 
 ## [0.2.0] - 2026-10-25
 
@@ -43,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Default application image pin: `ghcr.io/hrodrig/kpm:v0.6.0`.
 - README aligned with the hrodrig selfhosted family (TOC, pick-a-path sections, layout, community policies/standards, gghstats clones badge).
 
-[Unreleased]: https://github.com/hrodrig/kpm-selfhosted/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/hrodrig/kpm-selfhosted/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/hrodrig/kpm-selfhosted/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/hrodrig/kpm-selfhosted/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/hrodrig/kpm-selfhosted/releases/tag/v0.1.0

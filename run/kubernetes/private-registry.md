@@ -9,11 +9,11 @@ The names below are a stand-in for one private Azure Container Registry. A real 
 | What | Public source | Private example |
 |------|----------------|-----------------|
 | Chart `kpm` `0.1.0` | `https://hrodrig.github.io/kpm-selfhosted/` | `oci://my-private.azcr.io/helm/kpm` |
-| Sampler image | `ghcr.io/hrodrig/kpm:v1.1.0` | `my-private.azcr.io/customer/kpm:v1.1.0` |
+| Sampler image | `ghcr.io/hrodrig/kpm:v1.2.0` | `my-private.azcr.io/customer/kpm:v1.2.0` |
 | Same image, digest tag | repo digest of that pull | `my-private.azcr.io/customer/kpm:sha256-<hex>` |
 | Recommend Job kubectl | `registry.k8s.io/kubectl:v1.33.13` | `my-private.azcr.io/customer/kubectl:v1.33.13` |
 
-Prefer a normal tag (`v1.1.0`, `v1.33.13`) in Helm values. The `sha256-<hex>` tag is the alternative when policy refuses a tag that can move. The hex is the digest of the image you pulled, with `sha256:` rewritten to `sha256-` because a tag cannot contain a colon.
+Prefer a normal tag (`v1.2.0`, `v1.33.13`) in Helm values. The `sha256-<hex>` tag is the alternative when policy refuses a tag that can move. The hex is the digest of the image you pulled, with `sha256:` rewritten to `sha256-` because a tag cannot contain a colon.
 
 ```mermaid
 sequenceDiagram
@@ -25,12 +25,12 @@ sequenceDiagram
 
   Note over API,Node: No route to the public internet
   Op->>Pub: helm pull kpm/kpm --version 0.1.0
-  Op->>Pub: docker pull ghcr.io/hrodrig/kpm:v1.1.0
+  Op->>Pub: docker pull ghcr.io/hrodrig/kpm:v1.2.0
   Op->>Pub: docker pull registry.k8s.io/kubectl:v1.33.13
-  Op->>Op: docker tag kpm as my-private.azcr.io/customer/kpm:v1.1.0 and :sha256-hex
+  Op->>Op: docker tag kpm as my-private.azcr.io/customer/kpm:v1.2.0 and :sha256-hex
   Op->>Op: docker tag kubectl as my-private.azcr.io/customer/kubectl:v1.33.13
   Op->>Reg: helm push chart to oci://…/helm
-  Op->>Reg: docker push customer/kpm:v1.1.0 and :sha256-hex
+  Op->>Reg: docker push customer/kpm:v1.2.0 and :sha256-hex
   Op->>Reg: docker push customer/kubectl:v1.33.13
   Op->>API: helm install from oci://…/helm/kpm
   Node->>Reg: kubelet pulls both images
@@ -65,9 +65,9 @@ helm push kpm-0.1.0.tgz oci://my-private.azcr.io/helm
 Suggested tags, one command per image. Pull the architecture the nodes run (`--platform linux/amd64` on an arm64 laptop if the pool is amd64). `docker push` of a plain pull copies that one architecture, not the whole multi-arch index.
 
 ```bash
-docker pull --platform linux/amd64 ghcr.io/hrodrig/kpm:v1.1.0
-docker tag ghcr.io/hrodrig/kpm:v1.1.0 my-private.azcr.io/customer/kpm:v1.1.0
-docker push my-private.azcr.io/customer/kpm:v1.1.0
+docker pull --platform linux/amd64 ghcr.io/hrodrig/kpm:v1.2.0
+docker tag ghcr.io/hrodrig/kpm:v1.2.0 my-private.azcr.io/customer/kpm:v1.2.0
+docker push my-private.azcr.io/customer/kpm:v1.2.0
 
 docker pull --platform linux/amd64 registry.k8s.io/kubectl:v1.33.13
 docker tag registry.k8s.io/kubectl:v1.33.13 my-private.azcr.io/customer/kubectl:v1.33.13
@@ -81,11 +81,11 @@ docker push my-private.azcr.io/customer/kubectl:v1.33.13
 ```bash
 chmod +x mirror-kpm-image.sh
 ./mirror-kpm-image.sh \
-  ghcr.io/hrodrig/kpm:v1.1.0 \
+  ghcr.io/hrodrig/kpm:v1.2.0 \
   my-private.azcr.io/customer/kpm
 ```
 
-The script prints both refs. Use the `v1.1.0` line in values unless policy requires the digest tag. Re-run after every upstream image change. The hex changes when the bytes change.
+The script prints both refs. Use the `v1.2.0` line in values unless policy requires the digest tag. Re-run after every upstream image change. The hex changes when the bytes change.
 
 ## 4. Install from the private registry
 
@@ -96,17 +96,17 @@ helm install kpm oci://my-private.azcr.io/helm/kpm --version 0.1.0 \
   --namespace kpm --create-namespace \
   --set secrets.existingSecret=kpm-secrets \
   --set image.repository=my-private.azcr.io/customer/kpm \
-  --set image.tag=v1.1.0 \
+  --set image.tag=v1.2.0 \
   --set recommend.kubectlImage=my-private.azcr.io/customer/kubectl:v1.33.13
 ```
 
-Digest tag instead of `v1.1.0`:
+Digest tag instead of `v1.2.0`:
 
 ```bash
 --set image.tag=sha256-<hex>
 ```
 
-Leave `image.tag` empty only when `image.repository` is still `ghcr.io/hrodrig/kpm`. Empty means `Chart.appVersion` (`v1.1.0`) on that public repository.
+Leave `image.tag` empty only when `image.repository` is still `ghcr.io/hrodrig/kpm`. Empty means `Chart.appVersion` (`v1.2.0`) on that public repository.
 
 Flat manifests: set `image:` on the sampler and on the recommend CronJob to the same private refs. Do not apply the sample CronJob and the Deployment against one PVC.
 

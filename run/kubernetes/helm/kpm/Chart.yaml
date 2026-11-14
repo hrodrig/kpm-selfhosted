@@ -2,8 +2,8 @@ apiVersion: v2
 name: kpm
 description: In-cluster kpm sampler. One RWO volume, one writer.
 type: application
-version: 0.1.0
-appVersion: v1.1.0
+version: 0.1.1
+appVersion: v1.2.0
 home: https://github.com/hrodrig/kpm-selfhosted
 sources:
   - https://github.com/hrodrig/kpm-selfhosted

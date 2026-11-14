@@ -5,7 +5,7 @@
 #
 # Usage:
 #   docker login my-private.azcr.io
-#   ./mirror-kpm-image.sh ghcr.io/hrodrig/kpm:v1.1.0 my-private.azcr.io/customer/kpm
+#   ./mirror-kpm-image.sh ghcr.io/hrodrig/kpm:v1.2.0 my-private.azcr.io/customer/kpm
 #
 # Optional: DOCKER_PLATFORM=linux/amd64 when the laptop arch is not the node arch.
 # Pulls one platform. It does not copy a multi-arch index.
